@@ -1,6 +1,6 @@
 import React from "react";
 
-const Store: React.FC = () => {
+const ProductCards: React.FC = () => {
   return <>
 
 <section className="bg-gray-50 py-8 antialiased dark:bg-gray-900 md:py-12">
@@ -1474,4 +1474,4 @@ const Store: React.FC = () => {
   </>;
 };
 
-export default Store;
+export default ProductCards;
