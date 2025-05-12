@@ -5,8 +5,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProtectedRoute from "./assets/PrivateRoutes";
 import Products from "./pages/Product";
-// import Store from "./pages/store";
-
+import Store from "./pages/Store"
 function App() {
   return (
     <Router>
@@ -17,7 +16,7 @@ function App() {
           <Route element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="/products" element={<Products />} />
-            {/* <Route path="/store" element={<Store />} /> */}
+            <Route path="/store" element={<Store />} />
           </Route>
         </Route>
       </Routes>
