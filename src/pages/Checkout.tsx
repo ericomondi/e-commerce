@@ -1,6 +1,8 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const Checkout: React.FC = () => {
+  const navigate = useNavigate();
   return (
     <>
       <section className="bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
@@ -190,7 +192,9 @@ const Checkout: React.FC = () => {
                           />
                           <mask
                             id="a"
-                            style={`mask-type:luminance` as React.CSSProperties}
+                            style={
+                              { maskType: "luminance" } as React.CSSProperties
+                            }
                             width="20"
                             height="15"
                             x="0"
@@ -316,7 +320,9 @@ const Checkout: React.FC = () => {
                                   <mask
                                     id="a"
                                     style={
-                                      `mask-type:luminance` as React.CSSProperties
+                                      {
+                                        maskType: "luminance",
+                                      } as React.CSSProperties
                                     }
                                     width="20"
                                     height="15"
@@ -422,7 +428,9 @@ const Checkout: React.FC = () => {
                                   <mask
                                     id="a"
                                     style={
-                                      `mask-type:luminance` as React.CSSProperties
+                                      {
+                                        maskType: "luminance",
+                                      } as React.CSSProperties
                                     }
                                     width="20"
                                     height="15"
@@ -487,7 +495,9 @@ const Checkout: React.FC = () => {
                                   <mask
                                     id="a"
                                     style={
-                                      `mask-type:luminance` as React.CSSProperties
+                                      {
+                                        maskType: "luminance",
+                                      } as React.CSSProperties
                                     }
                                     width="20"
                                     height="15"
@@ -581,7 +591,9 @@ const Checkout: React.FC = () => {
                                   <mask
                                     id="a"
                                     style={
-                                      `mask-type:luminance` as React.CSSProperties
+                                      {
+                                        maskType: "luminance",
+                                      } as React.CSSProperties
                                     }
                                     width="20"
                                     height="15"
@@ -713,7 +725,9 @@ const Checkout: React.FC = () => {
                                   <mask
                                     id="a"
                                     style={
-                                      `mask-type:luminance` as React.CSSProperties
+                                      {
+                                        maskType: "luminance",
+                                      } as React.CSSProperties
                                     }
                                     width="20"
                                     height="15"
@@ -1177,6 +1191,7 @@ const Checkout: React.FC = () => {
 
               <div className="space-y-3">
                 <button
+                  onClick={() => navigate("/order-summary")}
                   type="submit"
                   className="flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4  focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                 >
