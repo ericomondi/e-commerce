@@ -1,7 +1,10 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+// src/pages/Login.tsx
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useState } from "react";
+import { useAuth } from "../context/AuthContext"; // Import useAuth
+import { Link } from "react-router-dom";
+
 interface LoginFormData {
   email: string;
   password: string;
@@ -9,11 +12,11 @@ interface LoginFormData {
 
 interface ApiResponse {
   access_token: string;
-  // Add other expected response properties here
 }
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const { login } = useAuth(); // Get login function from context
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",
@@ -40,10 +43,9 @@ const Login: React.FC = () => {
         },
       });
 
-      // toast.success("Login Successful");
-      localStorage.setItem("token", response.data.access_token);
-      localStorage.setItem("isLoggedIn", "true");
-      navigate("/");
+      // Update auth state via context
+      login(response.data.access_token);
+      navigate("/"); // No need for window.location.reload()
     } catch (error) {
       console.error("Login error:", error);
       // toast.error("An error occurred. Please try again.");
