@@ -15,6 +15,7 @@ import OrderConfirmation from "./pages/OrderConfirmation";
 import OrderDetails from "./pages/OrderDetails";
 import OrderTracking from "./pages/OrderTracking";
 import OrdersOverview from "./pages/OrdersOverview";
+import ProductList from "./components/TestProductTable";
 
 function App() {
   return (
@@ -23,7 +24,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route element={<ProtectedRoute />}>
+          {/* <Route element={<ProtectedRoute />}> */}
             <Route element={<Layout />}>
               <Route index element={<Home />} />
               <Route path="/products" element={<Products />} />
@@ -35,8 +36,9 @@ function App() {
               <Route path="/order-tracking" element={<OrderTracking />} />
               <Route path="/order-details" element={<OrderDetails />} />
               <Route path="/orders-overview" element={<OrdersOverview />} />
+              <Route path="/test-products" element={<ProductList />} />
             </Route>
-          </Route>
+          {/* </Route> */}
         </Routes>
       </Router>
     </AuthProvider>
