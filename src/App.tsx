@@ -7,7 +7,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProtectedRoute from "./assets/PrivateRoutes";
 import Products from "./pages/Product";
-// import ProductCards from "./pages/ProductCards";
+import ProductCards from "./pages/ProductCards";
 import ShoppingCart from "./pages/ShoppingCart";
 import Checkout from "./pages/Checkout";
 import OrderSummary from "./pages/Order-Summary";
@@ -17,7 +17,7 @@ import OrderTracking from "./pages/OrderTracking";
 import OrdersOverview from "./pages/OrdersOverview";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from "react-toastify";
-import ProductCards from "./components/TestProductTable";
+import TestProductCards from "./components/TestProductTable";
 function App() {
   return (
     <AuthProvider>
@@ -48,7 +48,7 @@ function App() {
             <Route path="/order-tracking" element={<OrderTracking />} />
             <Route path="/order-details" element={<OrderDetails />} />
             <Route path="/orders-overview" element={<OrdersOverview />} />
-            <Route path="/test-products" element={<ProductCards />} />
+            <Route path="/test-products" element={<TestProductCards />} />
           </Route>
           {/* </Route> */}
         </Routes>
