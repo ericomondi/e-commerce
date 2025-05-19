@@ -18,9 +18,12 @@ import OrdersOverview from "./pages/OrdersOverview";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from "react-toastify";
 import TestProductCards from "./components/TestProductTable";
+import { ShoppingCartProvider } from "./context/ShoppingCartContext";
+
 function App() {
   return (
     <AuthProvider>
+      <ShoppingCartProvider>
       <Router>
         <ToastContainer
           position="top-right"
@@ -53,6 +56,7 @@ function App() {
           {/* </Route> */}
         </Routes>
       </Router>
+      </ShoppingCartProvider>
     </AuthProvider>
   );
 }
