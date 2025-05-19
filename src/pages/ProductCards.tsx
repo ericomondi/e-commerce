@@ -12,6 +12,7 @@ type CartItem = {
 };
 
 const ProductCards: React.FC = () => {
+    const imgEndPoint = "http://127.0.0.1:8000"
   // Use the custom hook to fetch products
   const { isLoading, products, totalPages, error, fetchProducts } = useFetchProducts();
 
@@ -314,22 +315,8 @@ const ProductCards: React.FC = () => {
                 >
                   <div className="h-56 w-full">
                     <a href="#">
-                      <img
-                        className="mx-auto h-full dark:hidden"
-                        src={
-                          product.img_url ||
-                          "https://flowbite.s3.amazonaws.com/blocks/e-commerce/imac-front.svg"
-                        }
-                        alt={product.name}
-                      />
-                      <img
-                        className="mx-auto hidden h-full dark:block"
-                        src={
-                          product.img_url ||
-                          "https://flowbite.s3.amazonaws.com/blocks/e-commerce/imac-front-dark.svg"
-                        }
-                        alt={product.name}
-                      />
+                     
+                     <img src={imgEndPoint + product.img_url } alt={product.name} />
                     </a>
                   </div>
                   <div className="pt-6">
