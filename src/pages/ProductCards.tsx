@@ -4,27 +4,25 @@ import { useFetchProducts } from "../components/UseFetchProducts";
 import { useShoppingCart } from "../context/ShoppingCartContext";
 
 type StoreItemProps = {
-  id: number
-  name: string
-  price: number
-  imgUrl: string
-}
-
+  id: number;
+  name: string;
+  price: number;
+  imgUrl: string;
+};
 
 const ProductCards: React.FC = () => {
   // Use the custom hook to fetch products
-  const { isLoading, products, totalPages, error, fetchProducts } = useFetchProducts();
+  const { isLoading, products, totalPages, error, fetchProducts } =
+    useFetchProducts();
   // state for the cart
-   const {
+  const {
     getItemQuantity,
     increaseCartQuantity,
     decreaseCartQuantity,
     removeFromCart,
-  } = useShoppingCart()
+  } = useShoppingCart();
   // Define the image endpoint
-  const imgEndPoint = "http://127.0.0.1:8000"
-
-
+  const imgEndPoint = "http://127.0.0.1:8000";
 
   // State for pagination and search
   const [currentPage, setCurrentPage] = useState(1);
@@ -40,8 +38,6 @@ const ProductCards: React.FC = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm]);
-
- 
 
   return (
     <>
@@ -301,8 +297,10 @@ const ProductCards: React.FC = () => {
                 >
                   <div className="h-56 w-full">
                     <a href="#">
-                     
-                     <img src={imgEndPoint + product.img_url } alt={product.name} />
+                      <img
+                        src={imgEndPoint + product.img_url}
+                        alt={product.name}
+                      />
                     </a>
                   </div>
                   <div className="pt-6">
@@ -345,7 +343,10 @@ const ProductCards: React.FC = () => {
                           data-popper-placement="top"
                         >
                           Quick look
-                          <div className="tooltip-arrow" data-popper-arrow=""></div>
+                          <div
+                            className="tooltip-arrow"
+                            data-popper-arrow=""
+                          ></div>
                         </div>
                         <button
                           type="button"
@@ -376,7 +377,10 @@ const ProductCards: React.FC = () => {
                           data-popper-placement="top"
                         >
                           Add to favorites
-                          <div className="tooltip-arrow" data-popper-arrow=""></div>
+                          <div
+                            className="tooltip-arrow"
+                            data-popper-arrow=""
+                          ></div>
                         </div>
                       </div>
                     </div>
@@ -401,8 +405,12 @@ const ProductCards: React.FC = () => {
                           </svg>
                         ))}
                       </div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">5.0</p>
-                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400">(455)</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        5.0
+                      </p>
+                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                        (455)
+                      </p>
                     </div>
                     <ul className="mt-2 flex items-center gap-4">
                       <li className="flex items-center gap-2">
@@ -483,19 +491,21 @@ const ProductCards: React.FC = () => {
           {/* Pagination */}
           {!isLoading && !error && totalPages > 1 && (
             <div className="mt-4 flex justify-center">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  className={`mx-1 rounded-lg px-3 py-1 ${
-                    currentPage === page
-                      ? "bg-primary-700 text-white"
-                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`mx-1 rounded-lg px-3 py-1 ${
+                      currentPage === page
+                        ? "bg-primary-700 text-white"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                )
+              )}
             </div>
           )}
 
