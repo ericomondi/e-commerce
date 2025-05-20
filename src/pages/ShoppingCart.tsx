@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import CartItem from "../components/CartItem";
 import { useShoppingCart } from "../context/ShoppingCartContext";
+import { formatCurrency } from "../cart/formatCurrency";
 
 type Product = {
   id: number;
@@ -11,7 +12,7 @@ type Product = {
 };
 
 const ShoppingCart: React.FC = () => {
-  const { cartItems } = useShoppingCart(); // e.g., [{ id: 28, quantity: 6 }, { id: 29, quantity: 1 }]
+  const { cartItems, cartQuantity } = useShoppingCart(); // e.g., [{ id: 28, quantity: 6 }, { id: 29, quantity: 1 }]
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,13 +48,8 @@ const ShoppingCart: React.FC = () => {
     return total + (cartItem ? cartItem.quantity * product.price : 0);
   }, 0);
 
-  // Fixed values for savings, store pickup, and tax (replace with dynamic logic if available)
-  const savings = 299.0; // Example fixed savings
-  const storePickup = 99.0; // Example fixed store pickup fee
-  const tax = 799.0; // Example fixed tax
-
   // Calculate total
-  const total = originalPrice - savings + storePickup + tax;
+  const subtotal = originalPrice;
 
   // Handle loading state
   if (loading) {
@@ -108,56 +104,29 @@ const ShoppingCart: React.FC = () => {
                   <div className="space-y-2">
                     <dl className="flex items-center justify-between gap-4">
                       <dt className="text-base font-normal text-gray-500 dark:text-gray-400">
-                        Original price
+                        Items total ({cartQuantity})
                       </dt>
                       <dd className="text-base font-medium text-gray-900 dark:text-white">
-                        Ksh {originalPrice.toFixed(2)}
-                      </dd>
-                    </dl>
-
-                    <dl className="flex items-center justify-between gap-4">
-                      <dt className="text-base font-normal text-gray-500 dark:text-gray-400">
-                        Savings
-                      </dt>
-                      <dd className="text-base font-medium text-green-600">
-                        -Ksh {savings.toFixed(2)}
-                      </dd>
-                    </dl>
-
-                    <dl className="flex items-center justify-between gap-4">
-                      <dt className="text-base font-normal text-gray-500 dark:text-gray-400">
-                        Store Pickup
-                      </dt>
-                      <dd className="text-base font-medium text-gray-900 dark:text-white">
-                        Ksh {storePickup.toFixed(2)}
-                      </dd>
-                    </dl>
-
-                    <dl className="flex items-center justify-between gap-4">
-                      <dt className="text-base font-normal text-gray-500 dark:text-gray-400">
-                        Tax
-                      </dt>
-                      <dd className="text-base font-medium text-gray-900 dark:text-white">
-                        Ksh {tax.toFixed(2)}
+                        {formatCurrency(subtotal)}
                       </dd>
                     </dl>
                   </div>
 
                   <dl className="flex items-center justify-between gap-4 border-t border-gray-200 pt-2 dark:border-gray-700">
                     <dt className="text-base font-bold text-gray-900 dark:text-white">
-                      Total
+                      Subtotal
                     </dt>
                     <dd className="text-base font-bold text-gray-900 dark:text-white">
-                      Ksh {total.toFixed(2)}{" "}
+                      {formatCurrency(subtotal)}
                     </dd>
                   </dl>
                 </div>
 
                 <a
                   href="/checkout"
-                  className="flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                  className="bg-blue-500 flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                 >
-                  Proceed to Checkout
+                  Checkout({formatCurrency(subtotal)})
                 </a>
 
                 <div className="flex items-center justify-center gap-2">
@@ -166,13 +135,13 @@ const ShoppingCart: React.FC = () => {
                     or{" "}
                   </span>
                   <a
-                    href="#"
+                    href="/store"
                     title=""
-                    className="inline-flex items-center gap-2 text-sm font-medium text-primary-700 underline hover:no-underline dark:text-primary-500"
+                    className="text-blue-500 font-bold inline-flex items-center gap-2 text-sm font-medium text-primary-700 underline hover:no-underline dark:text-primary-500"
                   >
                     Continue Shopping
                     <svg
-                      className="h-5 w-5"
+                      className=" h-5 w-5"
                       aria-hidden="true"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -210,7 +179,7 @@ const ShoppingCart: React.FC = () => {
                   </div>
                   <button
                     type="submit"
-                    className="flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                    className="bg-blue-600 flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                   >
                     Apply Code
                   </button>
