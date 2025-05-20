@@ -297,7 +297,7 @@ const ProductCards: React.FC = () => {
                 >
                   <div className="h-56 w-full">
                     <a href="#">
-                      <img
+                      <img   className="mx-auto h-full dark:block"
                         src={imgEndPoint + product.img_url}
                         alt={product.name}
                       />
