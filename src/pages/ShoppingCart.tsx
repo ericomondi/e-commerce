@@ -1,7 +1,61 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import CartItem from "../components/CartItem";
+import { useShoppingCart } from "../context/ShoppingCartContext";
+
+type Product = {
+  id: number;
+  name: string;
+  price: number;
+  img_url: string | null;
+};
 
 const ShoppingCart: React.FC = () => {
+  const { cartItems } = useShoppingCart(); // e.g., [{ id: 28, quantity: 6 }, { id: 29, quantity: 1 }]
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        // Fetch product details for each cart item concurrently
+        const promises = cartItems.map((item) =>
+          axios
+            .get<Product>(`http://localhost:8000/public/products/${item.id}`)
+            .then((res) => res.data)
+        );
+        const fetchedProducts = await Promise.all(promises);
+        setProducts(fetchedProducts);
+        setLoading(false);
+      } catch (err) {
+        setError("Failed to fetch product details");
+        setLoading(false);
+      }
+    };
+
+    if (cartItems.length > 0) {
+      fetchProducts();
+    } else {
+      setProducts([]);
+      setLoading(false);
+    }
+  }, [cartItems]);
+
+  // Handle loading state
+  if (loading) {
+    return <div className="text-center">Loading...</div>;
+  }
+
+  // Handle error state
+  if (error) {
+    return <div className="text-center text-red-600">{error}</div>;
+  }
+
+  // Handle empty cart
+  if (products.length === 0) {
+    return <div className="text-center">Your cart is empty.</div>;
+  }
   return (
     <>
       <section className="bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
@@ -13,9 +67,23 @@ const ShoppingCart: React.FC = () => {
             <div className="mx-auto w-full flex-none lg:max-w-2xl xl:max-w-4xl">
               <div className="space-y-6">
                 {/* CART  item =========== */}
-                <CartItem />
+                {products.map((product) => {
+                  const cartItem = cartItems.find(
+                    (item) => item.id === product.id
+                  );
+                  return (
+                    <CartItem
+                      key={product.id}
+                      id={product.id}
+                      name={product.name}
+                      price={product.price}
+                      img_url={product.img_url}
+                      quantity={cartItem ? cartItem.quantity : 0}
+                    />
+                  );
+                })}
               </div>
-              <div className="hidden xl:mt-8 xl:block">
+              {/* <div className="hidden xl:mt-8 xl:block">
                 <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
                   People also bought
                 </h3>
@@ -286,7 +354,7 @@ const ShoppingCart: React.FC = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             <div className="mx-auto mt-6 max-w-4xl flex-1 space-y-6 lg:mt-0 lg:w-full">
