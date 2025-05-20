@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import type { Product } from "../components/UseFetchProducts";
 import { useFetchProducts } from "../components/UseFetchProducts";
 import { useShoppingCart } from "../context/ShoppingCartContext";
+import { formatCurrency } from "../cart/formatCurrency";
 
 type StoreItemProps = {
   id: number;
@@ -454,12 +455,12 @@ const ProductCards: React.FC = () => {
                       </li>
                     </ul>
                     <div className="mt-4 flex items-center justify-between gap-4">
-                      <p className="text-2xl font-extrabold leading-tight text-gray-900 dark:text-white">
-                        ${product.price}
+                      <p className="text-lg font-extrabold leading-tight text-gray-900 dark:text-white">
+                        {formatCurrency(product.price)}
                       </p>
                       <button
                         type="button"
-                        className="inline-flex items-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                        className="bg-blue-600 inline-flex items-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                         onClick={() => increaseCartQuantity(product.id)}
                       >
                         <svg
