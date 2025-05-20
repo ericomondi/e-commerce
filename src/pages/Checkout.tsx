@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useFetchAddresses } from "../components/useFetchAddresses";
 
 const Checkout: React.FC = () => {
   const navigate = useNavigate();
@@ -90,13 +91,13 @@ const Checkout: React.FC = () => {
                       className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
                     >
                       {" "}
-                      Your name{" "}
+                      State{" "}
                     </label>
                     <input
                       type="text"
                       id="your_name"
                       className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
-                      placeholder="Bonnie Green"
+                      placeholder="Nairobi Centarl"
                       required
                     />
                   </div>
@@ -107,13 +108,13 @@ const Checkout: React.FC = () => {
                       className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
                     >
                       {" "}
-                      Your email*{" "}
+                      Street*{" "}
                     </label>
                     <input
                       type="email"
                       id="your_email"
                       className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
-                      placeholder="name@flowbite.com"
+                      placeholder="Kasarani"
                       required
                     />
                   </div>
@@ -784,47 +785,13 @@ const Checkout: React.FC = () => {
                       className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
                     >
                       {" "}
-                      Email{" "}
+                      Postal Code{" "}
                     </label>
                     <input
-                      type="email"
+                      type="text"
                       id="email"
                       className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
                       placeholder="name@flowbite.com"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="company_name"
-                      className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-                    >
-                      {" "}
-                      Company name{" "}
-                    </label>
-                    <input
-                      type="text"
-                      id="company_name"
-                      className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
-                      placeholder="Flowbite LLC"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="vat_number"
-                      className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-                    >
-                      {" "}
-                      VAT number{" "}
-                    </label>
-                    <input
-                      type="text"
-                      id="vat_number"
-                      className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
-                      placeholder="DE42313253"
                       required
                     />
                   </div>
@@ -1013,107 +980,7 @@ const Checkout: React.FC = () => {
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Delivery Methods
-                </h3>
-
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                  <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 ps-4 dark:border-gray-700 dark:bg-gray-800">
-                    <div className="flex items-start">
-                      <div className="flex h-5 items-center">
-                        <input
-                          id="dhl"
-                          aria-describedby="dhl-text"
-                          type="radio"
-                          name="delivery-method"
-                          value=""
-                          className="h-4 w-4 border-gray-300 bg-white text-primary-600 focus:ring-2 focus:ring-primary-600 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600"
-                          checked
-                        />
-                      </div>
-
-                      <div className="ms-4 text-sm">
-                        <label
-                          htmlFor="dhl"
-                          className="font-medium leading-none text-gray-900 dark:text-white"
-                        >
-                          {" "}
-                          $15 - DHL Fast Delivery{" "}
-                        </label>
-                        <p
-                          id="dhl-text"
-                          className="mt-1 text-xs font-normal text-gray-500 dark:text-gray-400"
-                        >
-                          Get it by Tommorow
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 ps-4 dark:border-gray-700 dark:bg-gray-800">
-                    <div className="flex items-start">
-                      <div className="flex h-5 items-center">
-                        <input
-                          id="fedex"
-                          aria-describedby="fedex-text"
-                          type="radio"
-                          name="delivery-method"
-                          value=""
-                          className="h-4 w-4 border-gray-300 bg-white text-primary-600 focus:ring-2 focus:ring-primary-600 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600"
-                        />
-                      </div>
-
-                      <div className="ms-4 text-sm">
-                        <label
-                          htmlFor="fedex"
-                          className="font-medium leading-none text-gray-900 dark:text-white"
-                        >
-                          {" "}
-                          Free Delivery - FedEx{" "}
-                        </label>
-                        <p
-                          id="fedex-text"
-                          className="mt-1 text-xs font-normal text-gray-500 dark:text-gray-400"
-                        >
-                          Get it by Friday, 13 Dec 2023
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 ps-4 dark:border-gray-700 dark:bg-gray-800">
-                    <div className="flex items-start">
-                      <div className="flex h-5 items-center">
-                        <input
-                          id="express"
-                          aria-describedby="express-text"
-                          type="radio"
-                          name="delivery-method"
-                          value=""
-                          className="h-4 w-4 border-gray-300 bg-white text-primary-600 focus:ring-2 focus:ring-primary-600 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600"
-                        />
-                      </div>
-
-                      <div className="ms-4 text-sm">
-                        <label
-                          htmlFor="express"
-                          className="font-medium leading-none text-gray-900 dark:text-white"
-                        >
-                          {" "}
-                          $49 - Express Delivery{" "}
-                        </label>
-                        <p
-                          id="express-text"
-                          className="mt-1 text-xs font-normal text-gray-500 dark:text-gray-400"
-                        >
-                          Get it today
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+          
 
               <div>
                 <label
