@@ -2,13 +2,11 @@ import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext"; // Import useAuth
 import CartDropdown from "./CartDropdown";
-// import { initFlowbite } from "flowbite"; // Import Flowbite initializer
-
+import { useShoppingCart } from "../context/ShoppingCartContext"; // Import useShoppingCart
 const Bar: React.FC = () => {
   const { isAuthenticated, logout } = useAuth(); // Use AuthContext
   const navigate = useNavigate();
-
-
+  const { cartQuantity } = useShoppingCart();
 
   const handleLogout = () => {
     logout(); // Use context logout
@@ -89,7 +87,7 @@ const Bar: React.FC = () => {
                 id="myCartDropdownButton1"
                 data-dropdown-toggle="myCartDropdown1"
                 type="button"
-                className="inline-flex items-center rounded-lg justify-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
+                className="relative inline-flex items-center rounded-lg justify-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm font-medium leading-none text-gray-900 dark:text-white"
               >
                 <span className="sr-only">Cart</span>
                 <svg
@@ -127,6 +125,11 @@ const Bar: React.FC = () => {
                     d="m19 9-7 7-7-7"
                   />
                 </svg>
+                {cartQuantity > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                    {cartQuantity}
+                  </span>
+                )}
               </button>
 
               <CartDropdown />
