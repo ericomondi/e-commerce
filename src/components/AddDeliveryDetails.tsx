@@ -67,7 +67,7 @@ const AddDeliveryDetails: React.FC = () => {
       <div className="relative max-h-auto w-full max-w-lg p-4">
         <div className="relative rounded-lg bg-white shadow dark:bg-gray-800">
           <div className="flex items-center justify-between rounded-t border-b border-gray-200 p-4 dark:border-gray-700 md:p-5">
-            <h3 className="text-lg font-semibold text-green-600 dark:text-green-400">
+            <h3 className="text-lg font-semibold text-white dark:text-white">
               Add Delivery Address
             </h3>
             <button
@@ -220,7 +220,7 @@ const AddDeliveryDetails: React.FC = () => {
             <div className="border-t border-gray-200 pt-4 dark:border-gray-700 md:pt-5">
               <button
                 type="submit"
-                className="me-2 inline-flex items-center rounded-lg bg-primary-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                className="bg-blue-600 me-2 inline-flex items-center rounded-lg bg-primary-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
               >
                 Save information
               </button>
@@ -228,7 +228,7 @@ const AddDeliveryDetails: React.FC = () => {
                 type="button"
                 id="close-modal-button"
                 data-modal-toggle="addBillingInformationModal"
-                className="me-2 rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
+                className=" me-2 rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
               >
                 Cancel
               </button>
