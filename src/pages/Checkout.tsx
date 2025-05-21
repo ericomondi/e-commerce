@@ -1,8 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useFetchAddresses } from "../components/useFetchAddresses";
-import AddAddress from "../components/DeliveryDetails";
 import DeliveryDetails from "../components/DeliveryDetails";
+import AddDeliveryDetails from "../components/AddDeliveryDetails";
 
 const Checkout: React.FC = () => {
   const navigate = useNavigate();
@@ -87,10 +87,12 @@ const Checkout: React.FC = () => {
                   Delivery Details
                 </h2>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <DeliveryDetails/>
+                  <DeliveryDetails />
                   <div className="sm:col-span-2">
                     <button
-                      type="submit"
+                      type="button"
+                      data-modal-target="addBillingInformationModal"
+                      data-modal-toggle="addBillingInformationModal"
                       className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700 disabled:opacity-50"
                     >
                       <svg
@@ -367,9 +369,11 @@ const Checkout: React.FC = () => {
                 </p>
               </div>
             </div>
+            
           </div>
         </form>
       </section>
+      <AddDeliveryDetails />
     </>
   );
 };
