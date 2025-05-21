@@ -1,7 +1,9 @@
 // src/components/DeliveryDetails.tsx
 import React, { useState, useEffect } from 'react';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface Address {
   id: number;
@@ -18,7 +20,6 @@ interface Address {
 const DeliveryDetails: React.FC = () => {
   const { token, isAuthenticated } = useAuth();
   const [addresses, setAddresses] = useState<Address[]>([]);
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -38,10 +39,42 @@ const DeliveryDetails: React.FC = () => {
         a.is_default === b.is_default ? 0 : a.is_default ? -1 : 1
       ).slice(0, 2);
       setAddresses(sortedAddresses);
-      setError(null);
     } catch (err) {
-      setError('Failed to fetch addresses');
+      toast.error('Failed to fetch addresses', {
+        style: { border: '1px solid #ef4444', color: '#111827' },
+        progressStyle: { background: '#ef4444' }, // Matches text-red-600
+      });
       console.error('Error fetching addresses:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (addressId: number) => {
+    if (!isAuthenticated || !token) {
+      toast.error('You must be logged in to delete an address', {
+        style: { border: '1px solid #ef4444', color: '#111827' },
+        progressStyle: { background: '#ef4444' },
+      });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await axios.delete(`http://localhost:8000/addresses/${addressId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.success('Address deleted successfully', {
+        style: { border: '1px solid #10b981', color: '#111827' },
+        progressStyle: { background: '#10b981' }, // Matches text-green-600
+      });
+      await fetchAddresses(); // Refresh address list
+    } catch (err: any) {
+      toast.error(err.response?.data?.detail || 'Failed to delete address', {
+        style: { border: '1px solid #ef4444', color: '#111827' },
+        progressStyle: { background: '#ef4444' },
+      });
+      console.error('Error deleting address:', err);
     } finally {
       setLoading(false);
     }
@@ -87,7 +120,9 @@ const DeliveryDetails: React.FC = () => {
         <div className="mt-4 flex items-center gap-2">
           <button
             type="button"
-            className="text-sm font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+            onClick={() => addresses[0] && handleDelete(addresses[0].id)}
+            className="text-sm font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={loading || !addresses[0]}
           >
             Delete
           </button>
@@ -118,7 +153,7 @@ const DeliveryDetails: React.FC = () => {
           <div className="ms-4 text-sm">
             <label
               htmlFor="credit-card"
-              className="font-medium leading-none text-white dark:text-white"
+              className="font-medium leading-none text-green-600 dark:text-green-400"
             >
               Address 2
             </label>
@@ -134,7 +169,9 @@ const DeliveryDetails: React.FC = () => {
         <div className="mt-4 flex items-center gap-2">
           <button
             type="button"
-            className="text-sm font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+            onClick={() => addresses[1] && handleDelete(addresses[1].id)}
+            className="text-sm font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={loading || !addresses[1]}
           >
             Delete
           </button>
