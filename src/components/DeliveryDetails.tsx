@@ -91,14 +91,19 @@ const DeliveryDetails: React.FC = () => {
 
   // Format address for display
   const formatAddress = (address: Address) => {
-    return `${address.street}, ${address.city}, ${address.postal_code}, ${address.country} | Phone: ${address.phone_number}`;
-  };
+  let addr = address.address;
+  if (address.additional_info) {
+    addr += `, ${address.additional_info}`;
+  }
+  addr += `, ${address.city}, ${address.region}`;
+  return `${addr} | Phone: ${address.phone_number}`;
+};
 
   return (
     <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
       <div className="text-sm">
         <p className="font-medium text-gray-900 dark:text-white">
-          Delivery Address
+          {address ? `${address.first_name} ${address.last_name}` : 'Delivery Address'}
         </p>
         <p className="mt-1 text-xs font-normal text-gray-500 dark:text-gray-400">
           {loading ? 'Loading...' : address ? formatAddress(address) : 'No address set'}

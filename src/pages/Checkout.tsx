@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { useFetchAddresses } from "../components/useFetchAddresses";
 import DeliveryDetails from "../components/DeliveryDetails";
 import AddDeliveryDetails from "../components/AddDeliveryDetails";
-import Payements from "../components/payment";
+import Payements from "../components/paymentOptions";
 import { useShoppingCart } from "../context/ShoppingCartContext";
 import { formatCurrency } from "../cart/formatCurrency";
 
