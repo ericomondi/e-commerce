@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { useFetchAddresses } from "../components/useFetchAddresses";
 import DeliveryDetails from "../components/DeliveryDetails";
 import AddDeliveryDetails from "../components/AddDeliveryDetails";
@@ -9,20 +10,35 @@ import { formatCurrency } from "../cart/formatCurrency";
 
 const Checkout: React.FC = () => {
   const navigate = useNavigate();
-  const { cartItems } = useShoppingCart();
+  const { cartItems, paymentMethod, mpesaPhone } = useShoppingCart();
 
   // Calculate subtotal from cartItems
-  const subtotal = cartItems.reduce(
-    (total, item) => total + item.quantity * item.price,
-    0
-  );
+  const subtotal = cartItems.reduce((total, item) => total + item.quantity * item.price, 0);
 
   // Fixed values for delivery fee and tax
-  const deliveryFee = 99;
+  const deliveryFee = paymentMethod === "pay-on-delivery" ? 150 : 0; // KSh 150 for Pay on Delivery, 0 for Pickup or M-Pesa
   const tax = 199;
 
   // Calculate total
   const total = subtotal + deliveryFee + tax;
+
+  // Validate M-Pesa phone number (basic validation: 10 digits starting with 07)
+  const isValidMpesaPhone = (phone: string | null) => {
+    return phone ? /^07\d{8}$/.test(phone) : false;
+  };
+
+  // Handle Proceed to Payment
+  const handleProceed = () => {
+    if (!paymentMethod) {
+      toast.error("Please select a payment method");
+      return;
+    }
+    if (paymentMethod === "mpesa" && !isValidMpesaPhone(mpesaPhone)) {
+      toast.error("Please enter a valid M-Pesa phone number (e.g., 0712345678)");
+      return;
+    }
+    navigate("/order-summary", { state: { paymentMethod, mpesaPhone } });
+  };
 
   // Handle empty cart
   if (cartItems.length === 0) {
@@ -47,8 +63,7 @@ const Checkout: React.FC = () => {
                 className="text-primary-700 underline hover:no-underline dark:text-primary-500"
               >
                 continue shopping
-              </a>
-              .
+              </a>.
             </p>
           </div>
         </div>
@@ -58,7 +73,14 @@ const Checkout: React.FC = () => {
 
   return (
     <section className="bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
-      <form action="#" className="mx-auto max-w-screen-xl px-4 2xl:px-0">
+      <form
+        action="#"
+        className="mx-auto max-w-screen-xl px-4 2xl:px-0"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleProceed();
+        }}
+      >
         <ol className="items-center flex w-full max-w-2xl text-center text-sm font-medium text-gray-500 dark:text-gray-400 sm:text-base">
           <a
             href="/shopping-cart"
@@ -136,7 +158,6 @@ const Checkout: React.FC = () => {
 
         <div className="mt-6 sm:mt-8 lg:flex lg:items-start lg:gap-12 xl:gap-16">
           <div className="min-w-0 flex-1 space-y-8">
-            {/* ======= Delivery Details ============ */}
             <div className="space-y-4">
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                 Delivery Details
@@ -172,7 +193,6 @@ const Checkout: React.FC = () => {
                 </div>
               </div>
             </div>
-            {/* ===============PAYMENTS ========== */}
             <Payements />
           </div>
 
@@ -219,9 +239,9 @@ const Checkout: React.FC = () => {
 
             <div className="space-y-3">
               <button
-                onClick={() => navigate("/order-summary")}
                 type="submit"
-                className="bg-blue-600 flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                className="flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 disabled:opacity-50"
+                disabled={!paymentMethod || (paymentMethod === "mpesa" && !isValidMpesaPhone(mpesaPhone))}
               >
                 Proceed to Payment
               </button>
