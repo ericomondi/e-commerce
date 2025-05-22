@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext } from "react";
 import type { ReactNode } from "react";
 import { useLocalStorage } from "../cart/useLocalStorage";
 
@@ -6,18 +6,17 @@ type ShoppingCartProviderProps = {
   children: ReactNode;
 };
 
-// Updated CartItem type to include name and price
+// Updated CartItem type to include img_url
 type CartItem = {
   id: number;
   name: string;
   price: number;
-  quantity: number;
   img_url: string | null;
+  quantity: number;
 };
 
-// Updated context type with new addToCart function
 type ShoppingCartContext = {
-  addToCart: (product: { id: number; name: string; price: number }) => void;
+  addToCart: (product: { id: number; name: string; price: number; img_url: string | null }) => void;
   increaseCartQuantity: (id: number) => void;
   decreaseCartQuantity: (id: number) => void;
   removeFromCart: (id: number) => void;
@@ -34,48 +33,29 @@ export function useShoppingCart() {
 }
 
 export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
-  const [cartItems, setCartItems] = useLocalStorage<CartItem[]>(
-    "shopping-cart",
-    []
-  );
+  const [cartItems, setCartItems] = useLocalStorage<CartItem[]>("shopping-cart", []);
 
-  const cartQuantity = cartItems.reduce(
-    (quantity, item) => item.quantity + quantity,
-    0
-  );
+  const cartQuantity = cartItems.reduce((quantity, item) => item.quantity + quantity, 0);
 
   function getItemQuantity(id: number) {
     return cartItems.find((item) => item.id === id)?.quantity || 0;
   }
 
-  // New function to add items with name and price
-  function addToCart(product: {
-    id: number;
-    name: string;
-    price: number;
-    img_url: string | null;
-  }) {
+  function addToCart(product: { id: number; name: string; price: number; img_url: string | null }) {
     setCartItems((currItems) => {
       if (currItems.find((item) => item.id === product.id) == null) {
-        // Item not in cart: add it with quantity 1
         return [...currItems, { ...product, quantity: 1 }];
       } else {
-        // Item exists: increase its quantity
         return currItems.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
+          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
     });
   }
 
-  // Modified to only increase quantity if item exists
   function increaseCartQuantity(id: number) {
     setCartItems((currItems) =>
-      currItems.map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
-      )
+      currItems.map((item) => (item.id === id ? { ...item, quantity: item.quantity + 1 } : item))
     );
   }
 
