@@ -16,10 +16,16 @@ type CartItem = {
 };
 
 type DeliveryMethod = "pickup" | "delivery" | null;
-type PaymentMethod = "pay-now-mpesa" | "pay-on-delivery-mpesa" | null;
+
+type PaymentMethod = "pay-now" | "pay-later" | null;
 
 type ShoppingCartContext = {
-  addToCart: (product: { id: number; name: string; price: number; img_url: string | null }) => void;
+  addToCart: (product: {
+    id: number;
+    name: string;
+    price: number;
+    img_url: string | null;
+  }) => void;
   increaseCartQuantity: (id: number) => void;
   decreaseCartQuantity: (id: number) => void;
   removeFromCart: (id: number) => void;
@@ -42,24 +48,46 @@ export function useShoppingCart() {
 }
 
 export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
-  const [cartItems, setCartItems] = useLocalStorage<CartItem[]>("shopping-cart", []);
-  const [deliveryMethod, setDeliveryMethod] = useLocalStorage<DeliveryMethod>("delivery-method", null);
-  const [paymentMethod, setPaymentMethod] = useLocalStorage<PaymentMethod>("payment-method", null);
-  const [mpesaPhone, setMpesaPhone] = useLocalStorage<string | null>("mpesa-phone", null);
+  const [cartItems, setCartItems] = useLocalStorage<CartItem[]>(
+    "shopping-cart",
+    []
+  );
+  const [deliveryMethod, setDeliveryMethod] = useLocalStorage<DeliveryMethod>(
+    "delivery-method",
+    null
+  );
+  const [paymentMethod, setPaymentMethod] = useLocalStorage<PaymentMethod>(
+    "payment-method",
+    null
+  );
+  const [mpesaPhone, setMpesaPhone] = useLocalStorage<string | null>(
+    "mpesa-phone",
+    null
+  );
 
-  const cartQuantity = cartItems.reduce((quantity, item) => item.quantity + quantity, 0);
+  const cartQuantity = cartItems.reduce(
+    (quantity, item) => item.quantity + quantity,
+    0
+  );
 
   function getItemQuantity(id: number) {
     return cartItems.find((item) => item.id === id)?.quantity || 0;
   }
 
-  function addToCart(product: { id: number; name: string; price: number; img_url: string | null }) {
+  function addToCart(product: {
+    id: number;
+    name: string;
+    price: number;
+    img_url: string | null;
+  }) {
     setCartItems((currItems) => {
       if (currItems.find((item) => item.id === product.id) == null) {
         return [...currItems, { ...product, quantity: 1 }];
       } else {
         return currItems.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
         );
       }
     });
@@ -67,7 +95,9 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
 
   function increaseCartQuantity(id: number) {
     setCartItems((currItems) =>
-      currItems.map((item) => (item.id === id ? { ...item, quantity: item.quantity + 1 } : item))
+      currItems.map((item) =>
+        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+      )
     );
   }
 
