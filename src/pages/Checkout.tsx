@@ -41,10 +41,11 @@ const Checkout: React.FC = () => {
       toast.error("Please select a payment method");
       return;
     }
-    if (!isValidMpesaPhone(mpesaPhone)) {
+    if (paymentMethod === "pay-now" && !isValidMpesaPhone(mpesaPhone)) {
       toast.error("Please enter a valid M-Pesa phone number (e.g., 0712345678)");
       return;
     }
+    // All validations passed, proceed to order summary
     navigate("/order-summary", { state: { deliveryMethod, paymentMethod, mpesaPhone } });
   };
 
@@ -249,8 +250,7 @@ const Checkout: React.FC = () => {
             <div className="space-y-3">
               <button
                 type="submit"
-                className="flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 disabled:opacity-50"
-                disabled={!deliveryMethod || !paymentMethod || !isValidMpesaPhone(mpesaPhone)}
+                className="bg-blue-600 flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
               >
                 Proceed to Payment
               </button>
