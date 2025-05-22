@@ -160,9 +160,9 @@ const Checkout: React.FC = () => {
           <div className="min-w-0 flex-1 space-y-8">
             <div className="space-y-4">
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                Delivery Details
+                Customer Address
               </h2>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-4 sm:col-span-2">
                 <DeliveryDetails />
                 <div className="sm:col-span-2">
                   <button
