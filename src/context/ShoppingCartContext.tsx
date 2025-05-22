@@ -1,3 +1,4 @@
+// ShoppingCartContext.tsx
 import { createContext, useContext } from "react";
 import { useLocalStorage } from "../cart/useLocalStorage";
 import type { ReactNode } from "react";
@@ -14,7 +15,8 @@ type CartItem = {
   quantity: number;
 };
 
-type PaymentMethod = "pay-on-delivery" | "pickup" | "mpesa" | null;
+type DeliveryMethod = "pickup" | "delivery" | null;
+type PaymentMethod = "pay-now-mpesa" | "pay-on-delivery-mpesa" | null;
 
 type ShoppingCartContext = {
   addToCart: (product: { id: number; name: string; price: number; img_url: string | null }) => void;
@@ -25,6 +27,8 @@ type ShoppingCartContext = {
   getItemQuantity: (id: number) => number;
   cartQuantity: number;
   cartItems: CartItem[];
+  deliveryMethod: DeliveryMethod;
+  setDeliveryMethod: (method: DeliveryMethod) => void;
   paymentMethod: PaymentMethod;
   setPaymentMethod: (method: PaymentMethod) => void;
   mpesaPhone: string | null;
@@ -39,6 +43,7 @@ export function useShoppingCart() {
 
 export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
   const [cartItems, setCartItems] = useLocalStorage<CartItem[]>("shopping-cart", []);
+  const [deliveryMethod, setDeliveryMethod] = useLocalStorage<DeliveryMethod>("delivery-method", null);
   const [paymentMethod, setPaymentMethod] = useLocalStorage<PaymentMethod>("payment-method", null);
   const [mpesaPhone, setMpesaPhone] = useLocalStorage<string | null>("mpesa-phone", null);
 
@@ -97,6 +102,8 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
         getItemQuantity,
         cartItems,
         cartQuantity,
+        deliveryMethod,
+        setDeliveryMethod,
         paymentMethod,
         setPaymentMethod,
         mpesaPhone,
