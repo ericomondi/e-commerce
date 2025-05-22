@@ -1,22 +1,26 @@
+// Checkout.tsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useFetchAddresses } from "../components/useFetchAddresses";
 import DeliveryDetails from "../components/DeliveryDetails";
 import AddDeliveryDetails from "../components/AddDeliveryDetails";
-import Payements from "../components/paymentOptions";
 import { useShoppingCart } from "../context/ShoppingCartContext";
 import { formatCurrency } from "../cart/formatCurrency";
+import DeliveryOptions from "../components/deliveryOptions";
+import PaymentOptions from "../components/paymentOptions";
 
 const Checkout: React.FC = () => {
   const navigate = useNavigate();
-  const { cartItems, paymentMethod, mpesaPhone } = useShoppingCart();
+  const { cartItems, deliveryMethod, paymentMethod, mpesaPhone } = useShoppingCart();
 
   // Calculate subtotal from cartItems
   const subtotal = cartItems.reduce((total, item) => total + item.quantity * item.price, 0);
 
-  // Fixed values for delivery fee and tax
-  const deliveryFee = paymentMethod === "pay-on-delivery" ? 150 : 0; // KSh 150 for Pay on Delivery, 0 for Pickup or M-Pesa
+  // Delivery fee based on delivery method
+  const deliveryFee = deliveryMethod === "delivery" ? 150 : 0; // KSh 150 for delivery, 0 for pickup
+
+  // Fixed tax value
   const tax = 199;
 
   // Calculate total
@@ -29,15 +33,19 @@ const Checkout: React.FC = () => {
 
   // Handle Proceed to Payment
   const handleProceed = () => {
+    if (!deliveryMethod) {
+      toast.error("Please select a delivery method");
+      return;
+    }
     if (!paymentMethod) {
       toast.error("Please select a payment method");
       return;
     }
-    if (paymentMethod === "mpesa" && !isValidMpesaPhone(mpesaPhone)) {
+    if (!isValidMpesaPhone(mpesaPhone)) {
       toast.error("Please enter a valid M-Pesa phone number (e.g., 0712345678)");
       return;
     }
-    navigate("/order-summary", { state: { paymentMethod, mpesaPhone } });
+    navigate("/order-summary", { state: { deliveryMethod, paymentMethod, mpesaPhone } });
   };
 
   // Handle empty cart
@@ -193,7 +201,8 @@ const Checkout: React.FC = () => {
                 </div>
               </div>
             </div>
-            <Payements />
+            <DeliveryOptions />
+            <PaymentOptions />
           </div>
 
           <div className="mt-6 w-full space-y-6 sm:mt-8 lg:mt-0 lg:max-w-xs xl:max-w-md">
@@ -241,7 +250,7 @@ const Checkout: React.FC = () => {
               <button
                 type="submit"
                 className="flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 disabled:opacity-50"
-                disabled={!paymentMethod || (paymentMethod === "mpesa" && !isValidMpesaPhone(mpesaPhone))}
+                disabled={!deliveryMethod || !paymentMethod || !isValidMpesaPhone(mpesaPhone)}
               >
                 Proceed to Payment
               </button>
