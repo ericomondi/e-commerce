@@ -1,12 +1,11 @@
 import { createContext, useContext } from "react";
-import type { ReactNode } from "react";
 import { useLocalStorage } from "../cart/useLocalStorage";
+import type { ReactNode } from "react";
 
 type ShoppingCartProviderProps = {
   children: ReactNode;
 };
 
-// Updated CartItem type to include img_url
 type CartItem = {
   id: number;
   name: string;
@@ -14,6 +13,8 @@ type CartItem = {
   img_url: string | null;
   quantity: number;
 };
+
+type PaymentMethod = "pay-on-delivery" | "pickup" | "mpesa" | null;
 
 type ShoppingCartContext = {
   addToCart: (product: { id: number; name: string; price: number; img_url: string | null }) => void;
@@ -24,6 +25,10 @@ type ShoppingCartContext = {
   getItemQuantity: (id: number) => number;
   cartQuantity: number;
   cartItems: CartItem[];
+  paymentMethod: PaymentMethod;
+  setPaymentMethod: (method: PaymentMethod) => void;
+  mpesaPhone: string | null;
+  setMpesaPhone: (phone: string | null) => void;
 };
 
 const ShoppingCartContext = createContext({} as ShoppingCartContext);
@@ -34,6 +39,8 @@ export function useShoppingCart() {
 
 export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
   const [cartItems, setCartItems] = useLocalStorage<CartItem[]>("shopping-cart", []);
+  const [paymentMethod, setPaymentMethod] = useLocalStorage<PaymentMethod>("payment-method", null);
+  const [mpesaPhone, setMpesaPhone] = useLocalStorage<string | null>("mpesa-phone", null);
 
   const cartQuantity = cartItems.reduce((quantity, item) => item.quantity + quantity, 0);
 
@@ -90,6 +97,10 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
         getItemQuantity,
         cartItems,
         cartQuantity,
+        paymentMethod,
+        setPaymentMethod,
+        mpesaPhone,
+        setMpesaPhone,
       }}
     >
       {children}
