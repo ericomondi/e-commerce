@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { formatCurrency } from "../cart/formatCurrency";
 
 // Define interfaces based on your pydantic models
 interface Product {
@@ -157,6 +158,16 @@ const OrderDetails: React.FC = () => {
     order.total - (order.total * TAX_RATE) / (1 + TAX_RATE) - DELIVERY_FEE;
   const taxAmount = subtotal * TAX_RATE;
 
+  // Format the address
+  const formatAddress = (address: Address | undefined) => {
+    if (!address) return "No address selected";
+    return `${address.first_name} ${address.last_name} - ${
+      address.phone_number
+    }, ${address.address}, ${address.city}, ${address.region}${
+      address.additional_info ? `, ${address.additional_info}` : ""
+    }`;
+  };
+
   return (
     <section className="bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
       <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
@@ -174,20 +185,6 @@ const OrderDetails: React.FC = () => {
 
         {/* Order Status */}
         <div className="mb-6">
-          <span
-            className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
-            ${
-              order.status === "delivered"
-                ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                : order.status === "pending"
-                ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
-                : order.status === "cancelled"
-                ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-                : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
-            }`}
-          >
-            {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-          </span>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
             Ordered on{" "}
             {new Date(order.datetime).toLocaleDateString("en-US", {
@@ -199,32 +196,6 @@ const OrderDetails: React.FC = () => {
             })}
           </p>
         </div>
-
-        {/* Delivery Address */}
-        {order.address && (
-          <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              Delivery Address
-            </h3>
-            <p className="text-gray-700 dark:text-gray-300">
-              {order.address.first_name} {order.address.last_name}
-            </p>
-            <p className="text-gray-700 dark:text-gray-300">
-              {order.address.address}
-            </p>
-            {order.address.additional_info && (
-              <p className="text-gray-700 dark:text-gray-300">
-                {order.address.additional_info}
-              </p>
-            )}
-            <p className="text-gray-700 dark:text-gray-300">
-              {order.address.city}, {order.address.region}
-            </p>
-            <p className="text-gray-700 dark:text-gray-300">
-              {order.address.phone_number}
-            </p>
-          </div>
-        )}
 
         <div className="mt-6 sm:mt-8 lg:flex lg:gap-8">
           <div className="w-full divide-y divide-gray-200 overflow-hidden rounded-lg border border-gray-200 dark:divide-gray-700 dark:border-gray-700 lg:max-w-xl xl:max-w-2xl">
@@ -278,7 +249,7 @@ const OrderDetails: React.FC = () => {
                       x{item.quantity}
                     </p>
                     <p className="text-xl font-bold leading-tight text-gray-900 dark:text-white">
-                      ${item.total_price.toFixed(2)}
+                      {formatCurrency(item.total_price)}
                     </p>
                   </div>
                 </div>
@@ -293,7 +264,7 @@ const OrderDetails: React.FC = () => {
                     Subtotal
                   </dt>
                   <dd className="font-medium text-gray-900 dark:text-white">
-                    ${subtotal.toFixed(2)}
+                    {formatCurrency(subtotal)}
                   </dd>
                 </dl>
 
@@ -302,7 +273,7 @@ const OrderDetails: React.FC = () => {
                     Delivery Fee
                   </dt>
                   <dd className="font-medium text-gray-900 dark:text-white">
-                    ${DELIVERY_FEE.toFixed(2)}
+                    {formatCurrency(DELIVERY_FEE)}
                   </dd>
                 </dl>
 
@@ -311,7 +282,7 @@ const OrderDetails: React.FC = () => {
                     Tax ({(TAX_RATE * 100).toFixed(0)}%)
                   </dt>
                   <dd className="font-medium text-gray-900 dark:text-white">
-                    ${taxAmount.toFixed(2)}
+                    {formatCurrency(taxAmount)}
                   </dd>
                 </dl>
               </div>
@@ -321,7 +292,7 @@ const OrderDetails: React.FC = () => {
                   Total
                 </dt>
                 <dd className="text-lg font-bold text-gray-900 dark:text-white">
-                  ${order.total.toFixed(2)}
+                  {formatCurrency(order.total)}
                 </dd>
               </dl>
             </div>
@@ -354,10 +325,10 @@ const OrderDetails: React.FC = () => {
                     </svg>
                   </span>
                   <h4 className="mb-0.5 text-base font-semibold text-gray-900 dark:text-white">
-                    Estimated delivery in 24 Nov 2023
+                    Estimated delivery
                   </h4>
                   <p className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                    Products delivered
+                    Within 48 hrs after order confirmation
                   </p>
                 </li>
 
@@ -382,17 +353,31 @@ const OrderDetails: React.FC = () => {
                     </svg>
                   </span>
                   <h4 className="mb-0.5 text-base font-semibold text-gray-900 dark:text-white">
-                    Today
+                    Order Status
                   </h4>
                   <p className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                    Products being delivered
+                    <span
+                      className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+            ${
+              order.status === "delivered"
+                ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                : order.status === "pending"
+                ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+                : order.status === "cancelled"
+                ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+            }`}
+                    >
+                      {order.status.charAt(0).toUpperCase() +
+                        order.status.slice(1)}
+                    </span>
                   </p>
                 </li>
 
-                <li className="mb-10 ms-6 text-primary-700 dark:text-primary-500">
-                  <span className="absolute -start-3 flex h-6 w-6 items-center justify-center rounded-full bg-primary-100 ring-8 ring-white dark:bg-primary-900 dark:ring-gray-800">
+                <li className="mb-10 ms-6">
+                  <span className="absolute -start-3 flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 ring-8 ring-white dark:bg-gray-700 dark:ring-gray-800">
                     <svg
-                      className="h-4 w-4"
+                      className="h-4 w-4 text-gray-500 dark:text-gray-400"
                       aria-hidden="true"
                       xmlns="http://www.w3.org/2000/svg"
                       width="24"
@@ -405,64 +390,16 @@ const OrderDetails: React.FC = () => {
                         stroke-linecap="round"
                         stroke-linejoin="round"
                         stroke-width="2"
-                        d="M5 11.917 9.724 16.5 19 7.5"
+                        d="m4 12 8-8 8 8M6 10.5V19a1 1 0 0 0 1 1h3v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h3a1 1 0 0 0 1-1v-8.5"
                       />
                     </svg>
                   </span>
-                  <h4 className="mb-0.5 font-semibold">23 Nov 2023, 15:15</h4>
-                  <p className="text-sm">Products in the courier's warehouse</p>
-                </li>
-
-                <li className="mb-10 ms-6 text-primary-700 dark:text-primary-500">
-                  <span className="absolute -start-3 flex h-6 w-6 items-center justify-center rounded-full bg-primary-100 ring-8 ring-white dark:bg-primary-900 dark:ring-gray-800">
-                    <svg
-                      className="h-4 w-4"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke="currentColor"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M5 11.917 9.724 16.5 19 7.5"
-                      />
-                    </svg>
-                  </span>
-                  <h4 className="mb-0.5 text-base font-semibold">
-                    22 Nov 2023, 12:27
+                  <h4 className="mb-0.5 text-base font-semibold text-gray-900 dark:text-white">
+                    Delivery Address
                   </h4>
-                  <p className="text-sm">
-                    Products delivered to the courier - DHL Express
+                  <p className="text-sm font-normal text-gray-500 dark:text-gray-400">
+                    {formatAddress(order.address)}{" "}
                   </p>
-                </li>
-
-                <li className="mb-10 ms-6 text-primary-700 dark:text-primary-500">
-                  <span className="absolute -start-3 flex h-6 w-6 items-center justify-center rounded-full bg-primary-100 ring-8 ring-white dark:bg-primary-900 dark:ring-gray-800">
-                    <svg
-                      className="h-4 w-4"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke="currentColor"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M5 11.917 9.724 16.5 19 7.5"
-                      />
-                    </svg>
-                  </span>
-                  <h4 className="mb-0.5 font-semibold">19 Nov 2023, 10:47</h4>
-                  <p className="text-sm">Payment accepted - VISA Credit Card</p>
                 </li>
 
                 <li className="ms-6 text-primary-700 dark:text-primary-500">
@@ -488,7 +425,7 @@ const OrderDetails: React.FC = () => {
                   <div>
                     <h4 className="mb-0.5 font-semibold">19 Nov 2023, 10:45</h4>
                     <a href="#" className="text-sm font-medium hover:underline">
-                      Order placed - Receipt #647563
+                      Order confirmed - Receipt #647563
                     </a>
                   </div>
                 </li>
