@@ -11,9 +11,8 @@ const OrderSummary: React.FC = () => {
   // Ensure cartItems and selectedAddress are defined
   const addressId = selectedAddress?.id;
 
-
   // Extract data from navigation state
-  const { deliveryMethod, paymentMethod, mpesaPhone } = location.state || {};
+  const { deliveryMethod, mpesaPhone } = location.state || {};
 
   // Calculate order summary values
   const subtotal = cartItems.reduce(
@@ -38,7 +37,7 @@ const OrderSummary: React.FC = () => {
       const token = localStorage.getItem("token");
       if (!token) {
         toast.error("Please log in to place an order");
-        navigate("/login"); // Redirect to login if not authenticated
+        navigate("/login");
         return;
       }
 
@@ -78,9 +77,40 @@ const OrderSummary: React.FC = () => {
       }
 
       const data = await response.json();
+
+      // Format the address fields for OrderConfirmation
+      const formattedAddress = selectedAddress
+        ? `${selectedAddress.address}, ${selectedAddress.city}, ${selectedAddress.region}`
+        : "No address selected";
+      const name = selectedAddress
+        ? `${selectedAddress.first_name} ${selectedAddress.last_name}`
+        : "No name provided";
+      const phoneNumber =
+        selectedAddress?.phone_number || "No phone number provided";
+
+      // Option 1: Use client-side date if API doesn't provide it
+      const orderDate = new Date().toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+
+      // Option 2: If the API returns the date, use data.order_date instead
+      // const orderDate = data.order_date || new Date().toLocaleDateString("en-US", { ... });
+
       toast.success("Order created successfully!");
-      clearCart(); // Clear the cart after successful order submission
-      navigate("/order-confirmation", { state: { orderId: data.order_id } });
+       // Navigate to OrderConfirmation with required fields
+      navigate("/order-confirmation", {
+        state: {
+          orderId: data.order_id,
+          orderDate, // Use either client-side or API-provided date
+          name,
+          address: formattedAddress,
+          phoneNumber,
+        },
+      });
+      clearCart();
+     
     } catch (error) {
       toast.error(
         error.message || "An error occurred while creating the order"
@@ -237,12 +267,12 @@ const OrderSummary: React.FC = () => {
                 </div>
 
                 <div className="gap-4 sm:flex sm:items-center">
-                  <button
-                    type="button"
+                  <a
+                    href="/store"
                     className="w-full rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
                   >
                     Return to Shopping
-                  </button>
+                  </a>
                   <button
                     onClick={() => handleSendOrder()}
                     type="submit"
