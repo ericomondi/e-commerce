@@ -19,7 +19,7 @@ const OrderSummary: React.FC = () => {
     (total, item) => total + item.quantity * item.price,
     0
   );
-  const deliveryFee = deliveryMethod === "delivery" ? 150 : 0; // Example logic
+  const deliveryFee =  150 ; // Example logic
   const tax = 199; // Fixed tax value, can be made dynamic
   const total = subtotal + deliveryFee + tax;
 
@@ -103,7 +103,7 @@ const OrderSummary: React.FC = () => {
       navigate("/order-confirmation", {
         state: {
           orderId: data.order_id,
-          orderDate, // Use either client-side or API-provided date
+          orderDate, 
           name,
           address: formattedAddress,
           phoneNumber,

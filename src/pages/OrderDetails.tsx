@@ -55,9 +55,8 @@ const OrderDetails: React.FC = () => {
   console.log("All URL params:", params);
   console.log("Extracted Order ID:", orderId);
 
-  // Configuration variables for tax and delivery
-  const TAX_RATE = 0.08; // 8% tax rate
-  const DELIVERY_FEE = 99; // Fixed delivery fee
+  // Configuration variables for delivery
+  const DELIVERY_FEE = 150; // Fixed delivery fee
 
   // image endpoint
 
@@ -154,9 +153,9 @@ const OrderDetails: React.FC = () => {
   }
 
   // Calculate subtotal (total from database minus tax and delivery)
-  const subtotal =
-    order.total - (order.total * TAX_RATE) / (1 + TAX_RATE) - DELIVERY_FEE;
-  const taxAmount = subtotal * TAX_RATE;
+  const subtotal = order.total;
+  const taxAmount = 199;
+  const grandTotal = subtotal + DELIVERY_FEE + taxAmount;
 
   // Format the address
   const formatAddress = (address: Address | undefined) => {
@@ -279,7 +278,7 @@ const OrderDetails: React.FC = () => {
 
                 <dl className="flex items-center justify-between gap-4">
                   <dt className="font-normal text-gray-500 dark:text-gray-400">
-                    Tax ({(TAX_RATE * 100).toFixed(0)}%)
+                    Tax
                   </dt>
                   <dd className="font-medium text-gray-900 dark:text-white">
                     {formatCurrency(taxAmount)}
@@ -292,7 +291,7 @@ const OrderDetails: React.FC = () => {
                   Total
                 </dt>
                 <dd className="text-lg font-bold text-gray-900 dark:text-white">
-                  {formatCurrency(order.total)}
+                  {formatCurrency(order.total)} or {formatCurrency(grandTotal)}
                 </dd>
               </dl>
             </div>
