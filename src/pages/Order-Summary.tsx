@@ -7,8 +7,7 @@ import { toast } from "react-toastify";
 const OrderSummary: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { cartItems, selectedAddress, clearCart } = useShoppingCart(); // Assuming ShoppingCartContext provides these
-  // Ensure cartItems and selectedAddress are defined
+  const { cartItems, selectedAddress, clearCart } = useShoppingCart();
   const addressId = selectedAddress?.id;
 
   // Extract data from navigation state
@@ -19,7 +18,7 @@ const OrderSummary: React.FC = () => {
     (total, item) => total + item.quantity * item.price,
     0
   );
-  const deliveryFee =  150 ; // Example logic
+  const deliveryFee = 150; // Example logic; could be dynamic based on deliveryMethod
   const tax = 199; // Fixed tax value, can be made dynamic
   const total = subtotal + deliveryFee + tax;
 
@@ -30,7 +29,6 @@ const OrderSummary: React.FC = () => {
   };
 
   // Order Sending logic
-
   const handleSendOrder = async () => {
     try {
       // Retrieve the authentication token
@@ -57,7 +55,8 @@ const OrderSummary: React.FC = () => {
           id: item.id,
           quantity: item.quantity,
         })),
-        address_id: addressId,
+        address_id: addressId || null, // Ensure null if no address
+        delivery_fee: deliveryFee, // Include delivery_fee
       };
 
       // Make the API request
@@ -73,7 +72,17 @@ const OrderSummary: React.FC = () => {
       // Handle the response
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.detail || "Failed to create order");
+        const errorMessage = errorData.detail || "Failed to create order";
+        if (errorMessage.includes("Invalid address ID")) {
+          toast.error("Selected address is invalid");
+        } else if (errorMessage.includes("Product ID")) {
+          toast.error("One or more products are not available");
+        } else if (errorMessage.includes("Insufficient stock")) {
+          toast.error("Insufficient stock for one or more products");
+        } else {
+          toast.error(errorMessage);
+        }
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
@@ -88,29 +97,26 @@ const OrderSummary: React.FC = () => {
       const phoneNumber =
         selectedAddress?.phone_number || "No phone number provided";
 
-      // Option 1: Use client-side date if API doesn't provide it
+      // Use client-side date since backend sets datetime automatically
       const orderDate = new Date().toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
         day: "numeric",
       });
 
-      // Option 2: If the API returns the date, use data.order_date instead
-      // const orderDate = data.order_date || new Date().toLocaleDateString("en-US", { ... });
-
       toast.success("Order created successfully!");
-       // Navigate to OrderConfirmation with required fields
+      // Navigate to OrderConfirmation with required fields
       navigate("/order-confirmation", {
         state: {
           orderId: data.order_id,
-          orderDate, 
+          orderDate,
           name,
           address: formattedAddress,
           phoneNumber,
+          deliveryFee, // Optionally pass deliveryFee for display
         },
       });
       clearCart();
-     
     } catch (error) {
       toast.error(
         error.message || "An error occurred while creating the order"
@@ -118,6 +124,7 @@ const OrderSummary: React.FC = () => {
       console.error("Order submission error:", error);
     }
   };
+
 
   return (
     <>
