@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useAuth } from "../context/AuthContext";
 
 // Define interfaces for type safety
 interface Address {
@@ -66,6 +67,7 @@ interface Order {
 }
 
 const OrdersMangement: React.FC = () => {
+  const {token} = useAuth()
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
   const [total, setTotal] = useState(0);
@@ -122,7 +124,6 @@ const OrdersMangement: React.FC = () => {
   const fetchOrders = async () => {
     setLoading(true);
     setError(null);
-    const token = localStorage.getItem("token");
 
     if (!token) {
       setError("No authentication token found. Please log in.");
@@ -182,7 +183,6 @@ const OrdersMangement: React.FC = () => {
     orderId: number,
     newStatus: Order["status"]
   ) => {
-    const token = localStorage.getItem("token");
     if (!token) {
       setError("No authentication token found. Please log in.");
       return;

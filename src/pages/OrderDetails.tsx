@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { formatCurrency } from "../cart/formatCurrency";
+import { useAuth } from "../context/AuthContext";
 
 // Define interfaces based on your pydantic models
 interface Product {
@@ -42,6 +43,7 @@ interface Order {
 }
 
 const OrderDetails: React.FC = () => {
+  const {token} = useAuth()
   const navigate = useNavigate();
   const params = useParams();
   // Try different possible parameter names
@@ -71,7 +73,6 @@ const OrderDetails: React.FC = () => {
       }
 
       try {
-        const token = localStorage.getItem("token");
         if (!token) {
           setError("Authentication required");
           setLoading(false);

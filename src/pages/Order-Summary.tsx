@@ -3,8 +3,10 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useShoppingCart } from "../context/ShoppingCartContext";
 import { formatCurrency } from "../cart/formatCurrency";
 import { toast } from "react-toastify";
+import { useAuth } from "../context/AuthContext";
 
 const OrderSummary: React.FC = () => {
+  const {token} = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { cartItems, selectedAddress, clearCart } = useShoppingCart();
@@ -31,8 +33,6 @@ const OrderSummary: React.FC = () => {
   // Order Sending logic
   const handleSendOrder = async () => {
     try {
-      // Retrieve the authentication token
-      const token = localStorage.getItem("token");
       if (!token) {
         toast.error("Please log in to place an order");
         navigate("/login");
