@@ -153,9 +153,8 @@ const OrderDetails: React.FC = () => {
   }
 
   // Calculate subtotal (total from database minus tax and delivery)
-  const subtotal = order.total;
-  const taxAmount = 199;
-  const grandTotal = subtotal + DELIVERY_FEE + taxAmount;
+  const subtotal = order.total - DELIVERY_FEE;
+  const grandTotal = subtotal + DELIVERY_FEE;
 
   // Format the address
   const formatAddress = (address: Address | undefined) => {
@@ -276,14 +275,6 @@ const OrderDetails: React.FC = () => {
                   </dd>
                 </dl>
 
-                <dl className="flex items-center justify-between gap-4">
-                  <dt className="font-normal text-gray-500 dark:text-gray-400">
-                    Tax
-                  </dt>
-                  <dd className="font-medium text-gray-900 dark:text-white">
-                    {formatCurrency(taxAmount)}
-                  </dd>
-                </dl>
               </div>
 
               <dl className="flex items-center justify-between gap-4 border-t border-gray-200 pt-2 dark:border-gray-700">

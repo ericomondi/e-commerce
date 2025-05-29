@@ -118,6 +118,7 @@ const AddDeliveryDetails: React.FC = () => {
         style: { border: "1px solid #10b981", color: "#111827" },
         progressStyle: { background: "#10b981" },
       });
+      window.location.reload(); 
       
       // Reset form
       setFormData({

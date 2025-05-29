@@ -19,8 +19,8 @@ const OrderSummary: React.FC = () => {
     0
   );
   const deliveryFee = 150; // Example logic; could be dynamic based on deliveryMethod
-  const tax = 199; // Fixed tax value, can be made dynamic
-  const total = subtotal + deliveryFee + tax;
+  // const tax = 199; // Fixed tax value, can be made dynamic
+  const total = subtotal + deliveryFee;
 
   // Function to format the address
   const formatAddress = (address) => {
@@ -124,7 +124,6 @@ const OrderSummary: React.FC = () => {
       console.error("Order submission error:", error);
     }
   };
-
 
   return (
     <>
@@ -231,12 +230,6 @@ const OrderSummary: React.FC = () => {
                       </dt>
                       <dd className="text-base font-medium text-gray-900 dark:text-white">
                         {formatCurrency(deliveryFee)}
-                      </dd>
-                    </dl>
-                    <dl className="flex items-center justify-between gap-4">
-                      <dt className="text-gray-500 dark:text-gray-400">Tax</dt>
-                      <dd className="text-base font-medium text-gray-900 dark:text-white">
-                        {formatCurrency(tax)}
                       </dd>
                     </dl>
                   </div>
