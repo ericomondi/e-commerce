@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useShoppingCart } from "../context/ShoppingCartContext";
 import { formatCurrency } from "../cart/formatCurrency";
@@ -6,15 +6,17 @@ import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
 
 const OrderSummary: React.FC = () => {
-  const {token} = useAuth();
+  const { token } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { cartItems, selectedAddress, clearCart, total, subtotal, deliveryFee } = useShoppingCart();
   const addressId = selectedAddress?.id;
+  
+  // Add loading state to prevent double submission
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Extract data from navigation state
   const { deliveryMethod, mpesaPhone } = location.state || {};
-
 
   // Function to format the address
   const formatAddress = (address) => {
@@ -24,6 +26,13 @@ const OrderSummary: React.FC = () => {
 
   // Order Sending logic
   const handleSendOrder = async () => {
+    // Prevent double submission
+    if (isSubmitting) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
     try {
       if (!token) {
         toast.error("Please log in to place an order");
@@ -96,7 +105,11 @@ const OrderSummary: React.FC = () => {
         day: "numeric",
       });
 
+      // Clear cart BEFORE navigation to prevent race conditions
+      clearCart();
+      
       toast.success("Order created successfully!");
+      
       // Navigate to OrderConfirmation with required fields
       navigate("/order-confirmation", {
         state: {
@@ -107,13 +120,16 @@ const OrderSummary: React.FC = () => {
           phoneNumber,
           deliveryFee, // Optionally pass deliveryFee for display
         },
+        replace: true, // Use replace to prevent going back to order summary
       });
-      clearCart();
+      
     } catch (error) {
       toast.error(
         error.message || "An error occurred while creating the order"
       );
       console.error("Order submission error:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -266,11 +282,42 @@ const OrderSummary: React.FC = () => {
                     Return to Shopping
                   </a>
                   <button
-                    onClick={() => handleSendOrder()}
-                    type="submit"
-                    className="bg-blue-600 mt-4 flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 sm:mt-0"
+                    onClick={handleSendOrder}
+                    type="button"
+                    disabled={isSubmitting}
+                    className={`mt-4 flex w-full items-center justify-center rounded-lg px-5 py-2.5 text-sm font-medium text-white focus:outline-none focus:ring-4 sm:mt-0 ${
+                      isSubmitting
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-blue-600 hover:bg-blue-700 focus:ring-blue-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                    }`}
                   >
-                    Send the order
+                    {isSubmitting ? (
+                      <>
+                        <svg
+                          className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        Processing...
+                      </>
+                    ) : (
+                      "Send the order"
+                    )}
                   </button>
                 </div>
               </div>
