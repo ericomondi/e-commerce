@@ -19,6 +19,9 @@ const Checkout: React.FC = () => {
     mpesaPhone,
     selectedAddress,
     setSelectedAddress,
+    deliveryFee,
+    subtotal,
+    total,
   } = useShoppingCart();
   const { addresses, loading, error } = useFetchAddresses();
 
@@ -31,14 +34,6 @@ const Checkout: React.FC = () => {
       }
     }
   }, [addresses, selectedAddress, setSelectedAddress]);
-
-  // Calculate subtotal from cartItems
-  const subtotal = cartItems.reduce(
-    (total, item) => total + item.quantity * item.price,
-    0
-  );
-  const deliveryFee = deliveryMethod === "delivery" ? 150 : 0; // KSh 150 for delivery, 0 for pickup
-  const total = subtotal + deliveryFee;
 
   // Validate M-Pesa phone number
   const isValidMpesaPhone = (phone: string | null) => {
