@@ -9,20 +9,12 @@ const OrderSummary: React.FC = () => {
   const {token} = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { cartItems, selectedAddress, clearCart } = useShoppingCart();
+  const { cartItems, selectedAddress, clearCart, total, subtotal, deliveryFee } = useShoppingCart();
   const addressId = selectedAddress?.id;
 
   // Extract data from navigation state
   const { deliveryMethod, mpesaPhone } = location.state || {};
 
-  // Calculate order summary values
-  const subtotal = cartItems.reduce(
-    (total, item) => total + item.quantity * item.price,
-    0
-  );
-  const deliveryFee = 150; // Example logic; could be dynamic based on deliveryMethod
-  // const tax = 199; // Fixed tax value, can be made dynamic
-  const total = subtotal + deliveryFee;
 
   // Function to format the address
   const formatAddress = (address) => {
