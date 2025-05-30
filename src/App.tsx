@@ -19,6 +19,7 @@ import { ToastContainer } from "react-toastify";
 import { ShoppingCartProvider } from "./context/ShoppingCartContext";
 import AdminOrderTable from "./components/TestProductTable";
 import OrdersManagement from "./pages/OrderManagement";
+import NotFound from "./pages/NotFound";
 function App() {
   return (
     <AuthProvider>
@@ -51,6 +52,7 @@ function App() {
             <Route path="/orders-overview" element={<OrdersOverview />} />
             <Route path="/test-products" element={<AdminOrderTable />} />
             <Route path="/orders-management" element={<OrdersManagement />} />
+            <Route path="*" element={<NotFound />} />
           </Route>
           {/* </Route> */}
         </Routes>
