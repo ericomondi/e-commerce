@@ -20,6 +20,7 @@ import { ShoppingCartProvider } from "./context/ShoppingCartContext";
 import AdminOrderTable from "./components/TestProductTable";
 import OrdersManagement from "./pages/OrderManagement";
 import NotFound from "./pages/NotFound";
+import Payment from "./pages/Payment";
 function App() {
   return (
     <AuthProvider>
@@ -52,6 +53,7 @@ function App() {
             <Route path="/orders-overview" element={<OrdersOverview />} />
             <Route path="/test-products" element={<AdminOrderTable />} />
             <Route path="/orders-management" element={<OrdersManagement />} />
+            <Route path="/payment" element={<Payment />} />
             <Route path="*" element={<NotFound />} />
           </Route>
           {/* </Route> */}
