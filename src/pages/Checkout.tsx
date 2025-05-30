@@ -16,7 +16,6 @@ const Checkout: React.FC = () => {
     cartItems,
     deliveryMethod,
     paymentMethod,
-    mpesaPhone,
     selectedAddress,
     setSelectedAddress,
     deliveryFee,
@@ -35,34 +34,26 @@ const Checkout: React.FC = () => {
     }
   }, [addresses, selectedAddress, setSelectedAddress]);
 
-  // Validate M-Pesa phone number
-  const isValidMpesaPhone = (phone: string | null) => {
-    return phone ? /^07\d{8}$/.test(phone) : false;
-  };
+  // Check if the form is valid
+  const isFormValid = deliveryMethod && (deliveryMethod !== "delivery" || selectedAddress) && paymentMethod;
 
-  // Handle Proceed to Payment
+  // Handle Proceed to Payment or Order Summary
   const handleProceed = () => {
-    if (!deliveryMethod) {
-      toast.error("Please select a delivery method");
+    if (!isFormValid) {
+      if (!deliveryMethod) {
+        toast.error("Please select a delivery method");
+      } else if (deliveryMethod === "delivery" && !selectedAddress) {
+        toast.error("Please select a delivery address");
+      } else if (!paymentMethod) {
+        toast.error("Please select a payment method");
+      }
       return;
     }
-    if (deliveryMethod === "delivery" && !selectedAddress) {
-      toast.error("Please select a delivery address");
-      return;
+    if (paymentMethod === "pay-now") {
+      navigate("/payment");
+    } else {
+      navigate("/order-summary");
     }
-    if (!paymentMethod) {
-      toast.error("Please select a payment method");
-      return;
-    }
-    if (paymentMethod === "pay-now" && !isValidMpesaPhone(mpesaPhone)) {
-      toast.error(
-        "Please enter a valid M-Pesa phone number (e.g., 0712345678)"
-      );
-      return;
-    }
-    navigate("/order-summary", {
-      state: { deliveryMethod, paymentMethod, mpesaPhone },
-    });
   };
 
   if (cartItems.length === 0) {
@@ -239,7 +230,6 @@ const Checkout: React.FC = () => {
                     {formatCurrency(deliveryFee)}
                   </dd>
                 </dl>
-               
                 <dl className="flex items-center justify-between gap-4 py-3">
                   <dt className="text-base font-bold text-gray-900 dark:text-white">
                     Total
@@ -253,9 +243,10 @@ const Checkout: React.FC = () => {
             <div className="space-y-3">
               <button
                 type="submit"
-                className="bg-blue-600 flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                disabled={!isFormValid}
+                className={`bg-blue-600 flex w-full items-center justify-center rounded-lg px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 ${!isFormValid ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
-                Proceed to Payment
+                {paymentMethod === "pay-now" ? "Proceed to Payment" : "Proceed to Order Summary"}
               </button>
               <p className="text-sm font-normal text-gray-500 dark:text-gray-400">
                 One or more items in your cart require an account.{" "}
