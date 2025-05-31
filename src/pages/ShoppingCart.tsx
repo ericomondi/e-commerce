@@ -86,6 +86,7 @@ const ShoppingCart: React.FC = () => {
       // Navigate to checkout with the order ID
       navigate("/checkout", {
         state: {
+          subtotal: subtotal,
           orderId: data.order_id,
           orderCreated: true,
         },
