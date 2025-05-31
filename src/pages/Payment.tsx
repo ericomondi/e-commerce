@@ -1,6 +1,6 @@
-import React, { useState,  } from "react";
+import React, { useState } from "react";
 import { useShoppingCart } from "../context/ShoppingCartContext";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 // Mock formatCurrency function for demo
 const formatCurrency = (amount) => {
@@ -12,23 +12,18 @@ const formatCurrency = (amount) => {
 
 const Payment = () => {
   const location = useLocation();
-  // Mock cart data - replace with actual useShoppingCart hook
+  const navigate = useNavigate();
   const { deliveryFee } = useShoppingCart();
 
-  
   const [phoneNumber, setPhoneNumber] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Mock navigate function - replace with actual useNavigate hook
-  const navigate = (path) => console.log(`Navigate to: ${path}`);
-
   // get order_id, subtotal and total from state
-    const { orderId, orderCreated, subtotal } = location.state || {};
+  const { orderId, orderCreated, subtotal } = location.state || {};
 
   // calculate total using both subtotal and delivery fee
   const total = subtotal + deliveryFee;
-
 
   const handleMpesaPayment = async (e) => {
     e.preventDefault();
@@ -43,18 +38,81 @@ const Payment = () => {
       return;
     }
 
+    // Format phone number to 254 format
+    let formattedPhone = phoneNumber;
+    if (phoneNumber.startsWith('0')) {
+      formattedPhone = '254' + phoneNumber.substring(1);
+    } else if (phoneNumber.startsWith('+254')) {
+      formattedPhone = phoneNumber.substring(1);
+    }
+
+    // Prepare the transaction data
+    const transactionData = {
+      Amount: Math.round(total), // Ensure amount is an integer
+      PhoneNumber: formattedPhone,
+      AccountReference: orderId
+    };
+
     try {
-      // Simulate API call - replace with actual axios call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const response = await fetch('http://localhost:5000/ipn/daraja/lnmo/transact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true' // Skip ngrok browser warning
+        },
+        body: JSON.stringify(transactionData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
       
-      alert("M-Pesa payment initiated. Please check your phone to complete the payment.");
-      navigate("/order-confirmation");
+      // Check if the transaction was initiated successfully
+      if (result.ResponseCode === "0" || response.ok) {
+        alert("M-Pesa payment initiated successfully. Please check your phone to complete the payment.");
+        navigate("/order-confirmation", { 
+          state: { 
+            orderId, 
+            total, 
+            phoneNumber: formattedPhone,
+            transactionId: result.CheckoutRequestID || result.MerchantRequestID
+          }
+        });
+      } else {
+        throw new Error(result.ResponseDescription || "Failed to initiate payment");
+      }
     } catch (err) {
-      setError("Failed to initiate payment. Please try again.");
+      console.error('Payment error:', err);
+      setError(err.message || "Failed to initiate payment. Please try again.");
     } finally {
       setLoading(false);
     }
   };
+
+  // Handle case where order data is missing
+  if (!orderId || !subtotal) {
+    return (
+      <section className="bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
+        <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
+          <div className="mx-auto max-w-5xl text-center">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">Payment Error</h2>
+            <p className="mt-4 text-gray-600 dark:text-gray-400">
+              Order information is missing. Please go back to checkout and try again.
+            </p>
+            <button
+              onClick={() => navigate(-1)}
+              className="mt-4 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
+            >
+              Go Back
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
@@ -91,6 +149,10 @@ const Payment = () => {
 
             <div className="mt-6 grow sm:mt-8 lg:mt-0">
               <div className="space-y-4 rounded-lg border border-gray-100 bg-gray-50 p-6 dark:border-gray-700 dark:bg-gray-800">
+                <div className="mb-4">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Order ID: {orderId}</p>
+                </div>
+                
                 <dl className="flex items-center justify-between gap-4">
                   <dt className="text-base font-normal text-gray-500 dark:text-gray-400">Subtotal</dt>
                   <dd className="text-base font-medium text-gray-900 dark:text-white">{formatCurrency(subtotal)}</dd>
