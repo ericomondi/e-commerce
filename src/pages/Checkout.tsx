@@ -1,6 +1,6 @@
 // Checkout.tsx
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useFetchAddresses } from "../components/useFetchAddresses";
 import DeliveryDetails from "../components/DeliveryDetails";
@@ -12,6 +12,7 @@ import PaymentOptions from "../components/paymentOptions";
 
 const Checkout: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const {
     cartItems,
     deliveryMethod,
@@ -24,6 +25,9 @@ const Checkout: React.FC = () => {
   } = useShoppingCart();
   const { addresses, loading, error } = useFetchAddresses();
 
+  // Extract order data from navigation state
+  const { orderId, orderCreated } = location.state || {};
+
   // Set default address as selectedAddress if none is selected
   useEffect(() => {
     if (addresses && addresses.length > 0 && !selectedAddress) {
@@ -33,6 +37,13 @@ const Checkout: React.FC = () => {
       }
     }
   }, [addresses, selectedAddress, setSelectedAddress]);
+
+  // Show success message if order was just created
+  useEffect(() => {
+    if (orderCreated && orderId) {
+      toast.success(`Order #${orderId} created successfully! Complete your payment details.`);
+    }
+  }, [orderCreated, orderId]);
 
   // Check if the form is valid
   const isFormValid = deliveryMethod && (deliveryMethod !== "delivery" || selectedAddress) && paymentMethod;
@@ -49,14 +60,35 @@ const Checkout: React.FC = () => {
       }
       return;
     }
+
     if (paymentMethod === "pay-now") {
-      navigate("/payment");
+      navigate("/payment", {
+        state: {
+          orderId,
+          orderCreated: true,
+        },
+      });
     } else {
-      navigate("/order-summary");
+      navigate("/order-confirmation", {
+        state: {
+          orderId,
+          orderDate: new Date().toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          }),
+          name: selectedAddress ? `${selectedAddress.first_name} ${selectedAddress.last_name}` : "No name provided",
+          address: selectedAddress ? `${selectedAddress.address}, ${selectedAddress.city}, ${selectedAddress.region}` : "No address selected",
+          phoneNumber: selectedAddress?.phone_number || "No phone number provided",
+          deliveryFee,
+        },
+        replace: true,
+      });
     }
   };
 
-  if (cartItems.length === 0) {
+  // If no order ID and cart is empty (user navigated directly), redirect to cart
+  if (!orderId && cartItems.length === 0) {
     return (
       <section className="bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
         <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
@@ -65,7 +97,7 @@ const Checkout: React.FC = () => {
           </h2>
           <div className="text-center mt-6">
             <p className="text-gray-500 dark:text-gray-400">
-              Your cart is empty.{" "}
+              No active order found.{" "}
               <a
                 href="/shopping-cart"
                 className="text-primary-700 underline hover:no-underline dark:text-primary-500"
@@ -97,6 +129,15 @@ const Checkout: React.FC = () => {
           handleProceed();
         }}
       >
+        {/* Order ID Display */}
+        {orderId && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg dark:bg-green-900/20 dark:border-green-800">
+            <p className="text-green-800 dark:text-green-200">
+              <span className="font-medium">Order ID:</span> #{orderId}
+            </p>
+          </div>
+        )}
+
         <ol className="items-center flex w-full max-w-2xl text-center text-sm font-medium text-gray-500 dark:text-gray-400 sm:text-base">
           <a
             href="/shopping-cart"
@@ -246,7 +287,7 @@ const Checkout: React.FC = () => {
                 disabled={!isFormValid}
                 className={`bg-blue-600 flex w-full items-center justify-center rounded-lg px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 ${!isFormValid ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
-                {paymentMethod === "pay-now" ? "Proceed to Payment" : "Proceed to Order Summary"}
+                {paymentMethod === "pay-now" ? "Proceed to Payment" : "Complete Order"}
               </button>
               <p className="text-sm font-normal text-gray-500 dark:text-gray-400">
                 One or more items in your cart require an account.{" "}
