@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState,  } from "react";
 import { useShoppingCart } from "../context/ShoppingCartContext";
+import { useLocation } from "react-router-dom";
 
 // Mock formatCurrency function for demo
 const formatCurrency = (amount) => {
@@ -10,8 +11,9 @@ const formatCurrency = (amount) => {
 };
 
 const Payment = () => {
+  const location = useLocation();
   // Mock cart data - replace with actual useShoppingCart hook
-  const { total, subtotal, deliveryFee } = useShoppingCart();
+  const { deliveryFee } = useShoppingCart();
 
   
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -21,7 +23,12 @@ const Payment = () => {
   // Mock navigate function - replace with actual useNavigate hook
   const navigate = (path) => console.log(`Navigate to: ${path}`);
 
-  const orderId = new URLSearchParams(window.location.search).get("orderId") || "1";
+  // get order_id, subtotal and total from state
+    const { orderId, orderCreated, subtotal } = location.state || {};
+
+  // calculate total using both subtotal and delivery fee
+  const total = subtotal + deliveryFee;
+
 
   const handleMpesaPayment = async (e) => {
     e.preventDefault();
