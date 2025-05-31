@@ -20,13 +20,14 @@ const Checkout: React.FC = () => {
     selectedAddress,
     setSelectedAddress,
     deliveryFee,
-    subtotal,
-    total,
   } = useShoppingCart();
   const { addresses, loading, error } = useFetchAddresses();
 
   // Extract order data from navigation state
-  const { orderId, orderCreated } = location.state || {};
+  const { orderId, orderCreated, subtotal } = location.state || {};
+
+  // Calculate total
+  const total = subtotal + deliveryFee;
 
   // Set default address as selectedAddress if none is selected
   useEffect(() => {
@@ -64,6 +65,7 @@ const Checkout: React.FC = () => {
     if (paymentMethod === "pay-now") {
       navigate("/payment", {
         state: {
+          subtotal,
           orderId,
           orderCreated: true,
         },
