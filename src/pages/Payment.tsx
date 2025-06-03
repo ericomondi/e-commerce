@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useShoppingCart } from "../context/ShoppingCartContext";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 // Mock formatCurrency function for demo
 const formatCurrency = (amount) => {
@@ -11,6 +12,7 @@ const formatCurrency = (amount) => {
 };
 
 const Payment = () => {
+  const { token } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const { deliveryFee, selectedAddress } = useShoppingCart();
@@ -50,22 +52,23 @@ const Payment = () => {
 
     // Prepare the transaction data
     const transactionData = {
-      Amount: Math.round(total), // Keep as number
-      PhoneNumber: formattedPhone,
-      AccountReference: orderId ? orderId.toString() : "", // Convert to string
+      amount: Math.round(total), // Keep as number
+      phone_number: formattedPhone,
+      order_id: orderId ? orderId.toString() : "", // Convert to string
     };
 
     try {
       console.log("Sending transaction data:", transactionData);
 
       const response = await fetch(
-        "https://89b7-197-237-26-50.ngrok-free.app/ipn/daraja/lnmo/transact",
+        "https://5f83-197-237-26-50.ngrok-free.app/payments/lnmo/transact",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "ngrok-skip-browser-warning": "true", // Skip ngrok browser warning
             Accept: "application/json",
+            Authorization: `Bearer ${token}`
           },
           mode: "cors", // Explicitly set CORS mode
           body: JSON.stringify(transactionData),
