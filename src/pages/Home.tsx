@@ -1,4 +1,5 @@
 import React from "react";
+import ProductCards from "../components/ProductCards";
 
 const Home: React.FC = () => {
   return (
@@ -34,6 +35,7 @@ const Home: React.FC = () => {
             />
           </div>
         </div>
+        <ProductCards />
       </section>
     </>
   );
