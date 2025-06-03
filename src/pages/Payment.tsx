@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useShoppingCart } from "../context/ShoppingCartContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import OrderSummaryPop from "../components/OrderSummary";
 
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat("en-KE", {
@@ -26,7 +27,9 @@ const Payment = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [polling, setPolling] = useState(false);
-  const [checkoutRequestID, setCheckoutRequestID] = useState<string | null>(null);
+  const [checkoutRequestID, setCheckoutRequestID] = useState<string | null>(
+    null
+  );
   const [pollingTimeout, setPollingTimeout] = useState(false);
 
   const { orderId, orderCreated, subtotal } = location.state || {};
@@ -40,7 +43,9 @@ const Payment = () => {
     // Validate phone number (must be 10 digits starting with 0 or 12 digits starting with 254)
     const phoneRegex = /^(?:254[17]\d{8}|0[17]\d{8})$/;
     if (!phoneRegex.test(phoneNumber)) {
-      setError("Please enter a valid Kenyan phone number (e.g., 0712345678 or 254712345678)");
+      setError(
+        "Please enter a valid Kenyan phone number (e.g., 0712345678 or 254712345678)"
+      );
       setLoading(false);
       return;
     }
@@ -65,14 +70,17 @@ const Payment = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:8000/payments/lnmo/transact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(paymentData),
-      });
+      const response = await fetch(
+        "http://localhost:8000/payments/lnmo/transact",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(paymentData),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -96,42 +104,55 @@ const Payment = () => {
 
     if (polling && orderId && token) {
       console.log("Starting polling for order ID:", orderId);
-      
+
       // Set timeout for polling (2 minutes = 120,000ms, not 760,000ms)
       timeout = setTimeout(() => {
         console.log("Polling timeout reached");
         setPolling(false);
         setPollingTimeout(true);
-        setError("Payment confirmation timed out. Please try again or contact support if payment was deducted.");
+        setError(
+          "Payment confirmation timed out. Please try again or contact support if payment was deducted."
+        );
       }, 120000); // 2 minutes
 
       interval = setInterval(async () => {
         console.log("Polling payment status for order:", orderId);
         try {
-          const response = await fetch("http://localhost:8000/payments/transactions", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ order_id: orderId.toString() }),
-          });
-          
+          const response = await fetch(
+            "http://localhost:8000/payments/transactions",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({ order_id: orderId.toString() }),
+            }
+          );
+
           if (!response.ok) {
-            console.error("Failed to fetch payment status, status:", response.status);
+            console.error(
+              "Failed to fetch payment status, status:",
+              response.status
+            );
             const errorText = await response.text();
             console.error("Error response:", errorText);
-            throw new Error(`Failed to fetch payment status: ${response.status}`);
+            throw new Error(
+              `Failed to fetch payment status: ${response.status}`
+            );
           }
-          
+
           const data = await response.json();
           console.log("Payment status response:", data);
-          
+
           // Check if transaction exists and has a status
-          if (data.transaction && typeof data.transaction.status !== 'undefined') {
+          if (
+            data.transaction &&
+            typeof data.transaction.status !== "undefined"
+          ) {
             const status = data.transaction.status;
             console.log("Transaction status:", status);
-            
+
             if (status === 4) {
               // Payment successful
               console.log("Payment successful");
@@ -154,7 +175,8 @@ const Payment = () => {
                   address: selectedAddress
                     ? `${selectedAddress.address}, ${selectedAddress.city}, ${selectedAddress.region}`
                     : "No address selected",
-                  transactionId: data.transaction.transaction_id || checkoutRequestID,
+                  transactionId:
+                    data.transaction.transaction_id || checkoutRequestID,
                   mpesaCode: data.transaction.transaction_code,
                 },
               });
@@ -187,7 +209,7 @@ const Payment = () => {
           console.error("Error checking payment status:", err);
           // Don't stop polling on individual request errors unless it's a critical error
           // Only log the error and continue polling unless it's an auth error
-          if (err.message.includes('401') || err.message.includes('403')) {
+          if (err.message.includes("401") || err.message.includes("403")) {
             setPolling(false);
             clearInterval(interval);
             clearTimeout(timeout);
@@ -202,7 +224,16 @@ const Payment = () => {
       if (interval) clearInterval(interval);
       if (timeout) clearTimeout(timeout);
     };
-  }, [polling, orderId, navigate, checkoutRequestID, selectedAddress, total, phoneNumber, token]);
+  }, [
+    polling,
+    orderId,
+    navigate,
+    checkoutRequestID,
+    selectedAddress,
+    total,
+    phoneNumber,
+    token,
+  ]);
 
   if (!orderId || !subtotal) {
     return (
@@ -213,7 +244,8 @@ const Payment = () => {
               Payment Error
             </h2>
             <p className="mt-4 text-gray-600 dark:text-gray-400">
-              Order information is missing. Please go back to checkout and try again.
+              Order information is missing. Please go back to checkout and try
+              again.
             </p>
             <button
               onClick={() => navigate(-1)}
@@ -260,9 +292,12 @@ const Payment = () => {
                 {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
                 {polling && !error && (
                   <div className="mt-2">
-                    <p className="text-sm text-blue-600">Awaiting payment confirmation...</p>
+                    <p className="text-sm text-blue-600">
+                      Awaiting payment confirmation...
+                    </p>
                     <p className="text-xs text-gray-500 mt-1">
-                      Please complete the payment on your phone. This may take up to 2 minutes.
+                      Please complete the payment on your phone. This may take
+                      up to 2 minutes.
                     </p>
                   </div>
                 )}
@@ -315,7 +350,11 @@ const Payment = () => {
                     ></path>
                   </svg>
                 ) : null}
-                {loading ? "Initiating Payment..." : polling ? "Awaiting Payment..." : "Pay with M-Pesa"}
+                {loading
+                  ? "Initiating Payment..."
+                  : polling
+                  ? "Awaiting Payment..."
+                  : "Pay with M-Pesa"}
               </button>
             </div>
 
@@ -326,7 +365,18 @@ const Payment = () => {
                     Order ID: {orderId}
                   </p>
                 </div>
-
+                {/* <!-- Modal toggle --> */}
+                <div class="flex justify-center m-5">
+                  <button
+                    id="updateProductButton"
+                    data-modal-target="updateProductModal"
+                    data-modal-toggle="updateProductModal"
+                    class="block text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                    type="button"
+                  >
+                    Update product
+                  </button>
+                </div>
                 <dl className="flex items-center justify-between gap-4">
                   <dt className="text-base font-normal text-gray-500 dark:text-gray-400">
                     Subtotal
@@ -378,6 +428,7 @@ const Payment = () => {
           </p>
         </div>
       </div>
+      <OrderSummaryPop/>
     </section>
   );
 };
