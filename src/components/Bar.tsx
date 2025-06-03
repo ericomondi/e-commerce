@@ -199,7 +199,7 @@ const Bar: React.FC = () => {
                   </li>
                   <li>
                     <a
-                      href="#"
+                      href="/orders-overview"
                       title=""
                       className="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"
                     >
@@ -317,18 +317,18 @@ const Bar: React.FC = () => {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="/store"
                   className="hover:text-primary-700 dark:hover:text-primary-500"
                 >
-                  Best Sellers
+                  Todays Deals
                 </a>
               </li>
               <li>
                 <a
-                  href="#"
+                  href="/order-management"
                   className="hover:text-primary-700 dark:hover:text-primary-500"
                 >
-                  Gift Ideas
+                  Admin Orders
                 </a>
               </li>
               <li>
