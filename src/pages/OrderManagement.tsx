@@ -67,7 +67,7 @@ interface Order {
 }
 
 const OrdersMangement: React.FC = () => {
-  const {token} = useAuth()
+  const { token } = useAuth();
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
   const [total, setTotal] = useState(0);
@@ -261,17 +261,115 @@ const OrdersMangement: React.FC = () => {
     }).format(amount);
   };
 
-  // Get status badge classes
-  const getStatusBadgeClasses = (status: string) => {
+  // Map API status to frontend display
+  const getStatusBadge = (status) => {
     switch (status) {
+      case "processing":
+        return {
+          label: "Processed",
+          className: "bg-blue-200 text-white dark:bg-blue-900 dark:text-white",
+          icon: (
+            <svg
+              className="me-1 h-3 w-3"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M13 7h6l2 4m-8-4v8m0-8V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v9h2m8 0H9m4 0h2m4 0h2v-4m0 0h-5m3.5 5.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Zm-10 0a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"
+              />
+            </svg>
+          ),
+        };
       case "pending":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300";
+        return {
+          label: "Pending",
+          className:
+            "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
+          icon: (
+            <svg
+              className="me-1 h-3 w-3"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M13 7h6l2 4m-8-4v8m0-8V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v9h2m8 0H9m4 0h2m4 0h2v-4m0 0h-5m3.5 5.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Zm-10 0a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"
+              />
+            </svg>
+          ),
+        };
       case "delivered":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
+        return {
+          label: "Confirmed",
+          className:
+            "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
+          icon: (
+            <svg
+              className="me-1 h-3 w-3"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M5 11.917 9.724 16.5 19 7.5"
+              />
+            </svg>
+          ),
+        };
       case "cancelled":
-        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300";
+        return {
+          label: "Cancelled",
+          className:
+            "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
+          icon: (
+            <svg
+              className="me-1 h-3 w-3"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M6 18 17.94 6M18 18 6.06 6"
+              />
+            </svg>
+          ),
+        };
       default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300";
+        return {
+          label: status,
+          className:
+            "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
+          icon: null,
+        };
     }
   };
 
@@ -369,237 +467,241 @@ const OrdersMangement: React.FC = () => {
                     No orders found.
                   </div>
                 ) : (
-                  orders.map((order) => (
-                    <div
-                      key={order.order_id}
-                      className="flex flex-wrap items-center gap-y-4 border-b border-gray-200 py-4 dark:border-gray-700 md:py-5"
-                    >
-                      <dl className="w-1/2 sm:w-48">
-                        <dt className="text-base font-medium text-gray-500 dark:text-gray-400">
-                          Order ID:
-                        </dt>
-                        <dd className="mt-1.5 text-base font-semibold text-gray-900 dark:text-white">
-                          <a
-                            href="#"
-                            className="hover:underline"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              navigate(`/admin/orders/${order.order_id}`);
-                            }}
+                  orders.map((order) => {
+                    const badge = getStatusBadge(order.status); // Compute badge once per order
+                    return (
+                      <div
+                        key={order.order_id}
+                        className="flex flex-wrap items-center gap-y-4 border-b border-gray-200 py-4 dark:border-gray-700 md:py-5"
+                      >
+                        <dl className="w-1/2 sm:w-48">
+                          <dt className="text-base font-medium text-gray-500 dark:text-gray-400">
+                            Order ID:
+                          </dt>
+                          <dd className="mt-1.5 text-base font-semibold text-gray-900 dark:text-white">
+                            <a
+                              href="#"
+                              className="hover:underline"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                navigate(`/admin/orders/${order.order_id}`);
+                              }}
+                            >
+                              #{order.order_id}
+                            </a>
+                          </dd>
+                        </dl>
+                        <dl className="w-1/2 sm:w-48">
+                          <dt className="text-base font-medium text-gray-500 dark:text-gray-400">
+                            Customer Name:
+                          </dt>
+                          <dd className="mt-1.5 text-base font-semibold text-gray-900 dark:text-white">
+                            {order.address
+                              ? `${order.address.first_name} ${order.address.last_name}`
+                              : order.user
+                              ? order.user.username
+                              : "N/A"}
+                          </dd>
+                        </dl>
+                        <dl className="w-1/2 sm:w-1/4 md:flex-1 lg:w-auto">
+                          <dt className="text-base font-medium text-gray-500 dark:text-gray-400">
+                            Date:
+                          </dt>
+                          <dd className="mt-1.5 text-base font-semibold text-gray-900 dark:text-white">
+                            {formatDate(order.datetime)}
+                          </dd>
+                        </dl>
+                        <dl className="w-1/2 sm:w-1/5 md:flex-1 lg:w-auto">
+                          <dt className="text-base font-medium text-gray-500 dark:text-gray-400">
+                            Price:
+                          </dt>
+                          <dd className="mt-1.5 text-base font-semibold text-gray-900 dark:text-white">
+                            {formatCurrency(order.total)}
+                          </dd>
+                        </dl>
+                        <dl className="w-1/2 sm:w-1/4 sm:flex-1 lg:w-auto">
+                          <dt className="text-base font-medium text-gray-500 dark:text-gray-400">
+                            Status:
+                          </dt>
+                          <dd
+                            className={`me-2 mt-1.5 inline-flex shrink-0 items-center rounded px-2.5 py-0.5 text-xs font-medium ${badge.className}`}
                           >
-                            #{order.order_id}
-                          </a>
-                        </dd>
-                      </dl>
-                      <dl className="w-1/2 sm:w-48">
-                        <dt className="text-base font-medium text-gray-500 dark:text-gray-400">
-                          Customer Name:
-                        </dt>
-                        <dd className="mt-1.5 text-base font-semibold text-gray-900 dark:text-white">
-                          {order.address
-                            ? `${order.address.first_name} ${order.address.last_name}`
-                            : order.user
-                            ? order.user.username
-                            : "N/A"}
-                        </dd>
-                      </dl>
-                      <dl className="w-1/2 sm:w-1/4 md:flex-1 lg:w-auto">
-                        <dt className="text-base font-medium text-gray-500 dark:text-gray-400">
-                          Date:
-                        </dt>
-                        <dd className="mt-1.5 text-base font-semibold text-gray-900 dark:text-white">
-                          {formatDate(order.datetime)}
-                        </dd>
-                      </dl>
-                      <dl className="w-1/2 sm:w-1/5 md:flex-1 lg:w-auto">
-                        <dt className="text-base font-medium text-gray-500 dark:text-gray-400">
-                          Price:
-                        </dt>
-                        <dd className="mt-1.5 text-base font-semibold text-gray-900 dark:text-white">
-                          {formatCurrency(order.total)}
-                        </dd>
-                      </dl>
-                      <dl className="w-1/2 sm:w-1/4 sm:flex-1 lg:w-auto">
-                        <dt className="text-base font-medium text-gray-500 dark:text-gray-400">
-                          Status:
-                        </dt>
-                        <dd
-                          className={`me-2 mt-1.5 inline-flex shrink-0 items-center rounded px-2.5 py-0.5 text-xs font-medium ${getStatusBadgeClasses(
-                            order.status
-                          )}`}
-                        >
-                          {order.status.charAt(0).toUpperCase() +
-                            order.status.slice(1)}
-                        </dd>
-                      </dl>
-                      <div className="w-full sm:flex sm:w-32 sm:items-center sm:justify-end sm:gap-4 relative">
-                        <button
-                          type="button"
-                          className="flex w-full items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700 md:w-auto"
-                          onClick={() => toggleDropdown(order.order_id)}
-                        >
-                          Actions
-                          <svg
-                            className="-me-0.5 ms-1.5 h-4 w-4"
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            fill="none"
-                            viewBox="0 0 24 24"
+                            {badge.icon}
+                            {badge.label}
+                          </dd>
+                        </dl>
+                        {/* Rest of the JSX (Actions dropdown) remains unchanged */}
+                        <div className="w-full sm:flex sm:w-32 sm:items-center sm:justify-end sm:gap-4 relative">
+                          <button
+                            type="button"
+                            className="flex w-full items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700 md:w-auto"
+                            onClick={() => toggleDropdown(order.order_id)}
                           >
-                            <path
-                              stroke="currentColor"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="m19 9-7 7-7-7"
-                            />
-                          </svg>
-                        </button>
-                        {openDropdown === order.order_id && (
-                          <div
-                            ref={(el) =>
-                              (dropdownRefs.current[order.order_id] = el)
-                            }
-                            className="absolute right-0 top-full mt-1 z-10 w-48 divide-y divide-gray-100 rounded-lg bg-white shadow-lg dark:bg-gray-700 border border-gray-200 dark:border-gray-600"
-                          >
-                            <ul className="p-2 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                              <li>
-                                <button
-                                  className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
-                                  onClick={() => {
-                                    navigate(`/admin/orders/${order.order_id}`);
-                                    setOpenDropdown(null);
-                                  }}
-                                >
-                                  <svg
-                                    className="me-1.5 h-4 w-4 text-gray-400 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
-                                    aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="24"
-                                    height="24"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
+                            Actions
+                            <svg
+                              className="-me-0.5 ms-1.5 h-4 w-4"
+                              aria-hidden="true"
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="24"
+                              height="24"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                stroke="currentColor"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="m19 9-7 7-7-7"
+                              />
+                            </svg>
+                          </button>
+                          {openDropdown === order.order_id && (
+                            <div
+                              ref={(el) =>
+                                (dropdownRefs.current[order.order_id] = el)
+                              }
+                              className="absolute right-0 top-full mt-1 z-10 w-48 divide-y divide-gray-100 rounded-lg bg-white shadow-lg dark:bg-gray-700 border border-gray-200 dark:border-gray-600"
+                            >
+                              <ul className="p-2 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
+                                <li>
+                                  <button
+                                    className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                                    onClick={() => {
+                                      navigate(
+                                        `/admin/orders/${order.order_id}`
+                                      );
+                                      setOpenDropdown(null);
+                                    }}
                                   >
-                                    <path
-                                      stroke="currentColor"
-                                      strokeWidth="2"
-                                      d="M21 12c0 1.2-4.03 6-9 6s-9-4.8-9-6c0-1.2 4.03-6 9-6s9 4.8 9 6Z"
-                                    />
-                                    <path
-                                      stroke="currentColor"
-                                      strokeWidth="2"
-                                      d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                                    />
-                                  </svg>
-                                  Order details
-                                </button>
-                              </li>
-                              {order.status !== "cancelled" &&
-                                order.status !== "delivered" && (
-                                  <li>
-                                    <button
-                                      className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                                      onClick={() =>
-                                        updateOrderStatus(
-                                          order.order_id,
-                                          "cancelled"
-                                        )
-                                      }
+                                    <svg
+                                      className="me-1.5 h-4 w-4 text-gray-400 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
+                                      aria-hidden="true"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width="24"
+                                      height="24"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
                                     >
-                                      <svg
-                                        className="me-1.5 h-4 w-4"
-                                        aria-hidden="true"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="24"
-                                        height="24"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
+                                      <path
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        d="M21 12c0 1.2-4.03 6-9 6s-9-4.8-9-6c0-1.2 4.03-6 9-6s9 4.8 9 6Z"
+                                      />
+                                      <path
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                                      />
+                                    </svg>
+                                    Order details
+                                  </button>
+                                </li>
+                                {order.status !== "cancelled" &&
+                                  order.status !== "delivered" && (
+                                    <li>
+                                      <button
+                                        className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                                        onClick={() =>
+                                          updateOrderStatus(
+                                            order.order_id,
+                                            "cancelled"
+                                          )
+                                        }
                                       >
-                                        <path
-                                          stroke="currentColor"
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          strokeWidth="2"
-                                          d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"
-                                        />
-                                      </svg>
-                                      Cancel order
-                                    </button>
-                                  </li>
-                                )}
-                              <li>
-                                <button
-                                  className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
-                                  onClick={() =>
-                                    order.user && showAccountInfo(order.user)
-                                  }
-                                >
-                                  <svg
-                                    className="me-1.5 h-4 w-4 text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                                    aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="24"
-                                    height="24"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
+                                        <svg
+                                          className="me-1.5 h-4 w-4"
+                                          aria-hidden="true"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          width="24"
+                                          height="24"
+                                          fill="none"
+                                          viewBox="0 0 24 24"
+                                        >
+                                          <path
+                                            stroke="currentColor"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1M6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"
+                                          />
+                                        </svg>
+                                        Cancel order
+                                      </button>
+                                    </li>
+                                  )}
+                                <li>
+                                  <button
+                                    className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                                    onClick={() =>
+                                      order.user && showAccountInfo(order.user)
+                                    }
                                   >
-                                    <path
-                                      stroke="currentColor"
-                                      strokeLinecap="round"
-                                      strokeWidth="2"
-                                      d="M16 12a4 4 0 1 0-0-8 4 4 0 0 0 0 8z"
-                                    />
-                                    <path
-                                      stroke="currentColor"
-                                      strokeLinecap="round"
-                                      strokeWidth="2"
-                                      d="M3 20v-1 a4 4 0 0 1 4-4 h3"
-                                    />
-                                  </svg>
-                                  Account info
-                                </button>
-                              </li>
-                              {order.status !== "delivered" &&
-                                order.status !== "cancelled" && (
-                                  <li>
-                                    <button
-                                      className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-blue-600 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                                      onClick={() =>
-                                        updateOrderStatus(
-                                          order.order_id,
-                                          "delivered"
-                                        )
-                                      }
+                                    <svg
+                                      className="me-1.5 h-4 w-4 text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                                      aria-hidden="true"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width="24"
+                                      height="24"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
                                     >
-                                      <svg
-                                        className="me-1.5 h-4 w-4 text-blue-400 group-hover:text-blue-900 dark:group-hover:text-white"
-                                        aria-hidden="true"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="24"
-                                        height="24"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
+                                      <path
+                                        stroke="currentColor"
+                                        strokeLinecap="round"
+                                        strokeWidth="2"
+                                        d="M16 12a4 4 0 1 0-0-8 4 4 0 0 0 0 8z"
+                                      />
+                                      <path
+                                        stroke="currentColor"
+                                        strokeLinecap="round"
+                                        strokeWidth="2"
+                                        d="M3 20v-1 a4 4 0 0 1 4-4 h3"
+                                      />
+                                    </svg>
+                                    Account info
+                                  </button>
+                                </li>
+                                {order.status !== "delivered" &&
+                                  order.status !== "cancelled" && (
+                                    <li>
+                                      <button
+                                        className="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-blue-600 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                                        onClick={() =>
+                                          updateOrderStatus(
+                                            order.order_id,
+                                            "delivered"
+                                          )
+                                        }
                                       >
-                                        <path
-                                          stroke="currentColor"
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          strokeWidth="2"
-                                          d="M5 11.917 9.724 16.5 19 7.5"
-                                        />
-                                      </svg>
-                                      Mark as Delivered
-                                    </button>
-                                  </li>
-                                )}
-                            </ul>
-                          </div>
-                        )}
+                                        <svg
+                                          className="me-1.5 h-4 w-4 text-blue-400 group-hover:text-blue-900 dark:group-hover:text-white"
+                                          aria-hidden="true"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          width="24"
+                                          height="24"
+                                          fill="none"
+                                          viewBox="0 0 24 24"
+                                        >
+                                          <path
+                                            stroke="currentColor"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M5 11.917 9.724 16.5 19 7.5"
+                                          />
+                                        </svg>
+                                        Mark as Delivered
+                                      </button>
+                                    </li>
+                                  )}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
 
