@@ -153,12 +153,48 @@ const Payment = () => {
             const status = data.transaction.status;
             console.log("Transaction status:", status);
 
+            // Replace the existing success handling block (status === 4) with this:
+
             if (status === 4) {
               // Payment successful
               console.log("Payment successful");
               setPolling(false);
               clearInterval(interval);
               clearTimeout(timeout);
+
+              try {
+                // Update order status to processing
+                const updateStatusResponse = await fetch(
+                  `http://localhost:8000/update-order-status/${orderId}`,
+                  {
+                    method: "PUT",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({ status: "processing" }),
+                  }
+                );
+
+                if (!updateStatusResponse.ok) {
+                  console.error(
+                    "Failed to update order status:",
+                    updateStatusResponse.status
+                  );
+                  // Log the error but don't prevent navigation - payment was successful
+                  const errorText = await updateStatusResponse.text();
+                  console.error("Order status update error:", errorText);
+                } else {
+                  console.log(
+                    "Order status successfully updated to PROCESSING"
+                  );
+                }
+              } catch (updateError) {
+                console.error("Error updating order status:", updateError);
+                // Log the error but don't prevent navigation - payment was successful
+              }
+
+              // Navigate to confirmation page regardless of order status update result
               navigate("/order-confirmation", {
                 state: {
                   orderId,
@@ -428,7 +464,7 @@ const Payment = () => {
           </p>
         </div>
       </div>
-      <OrderSummaryPop/>
+      <OrderSummaryPop />
     </section>
   );
 };
